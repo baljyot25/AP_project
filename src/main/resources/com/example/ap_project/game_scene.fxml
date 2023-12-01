@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="668.0" prefWidth="314.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ap_project.GameSceneController">
+   <children>
+      <ImageView fitHeight="694.0" fitWidth="314.0" layoutX="1.0" layoutY="-26.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/Background_javafx.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="56.0" layoutY="119.0" prefHeight="35.0" prefWidth="201.0" text="Press Your Mouse on Screen" wrapText="true">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="68.0" layoutY="146.0" prefHeight="20.0" prefWidth="166.0" text="  to Stretch out the Stick">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="35.0" layoutX="124.0" layoutY="72.0" opacity="0.14" stroke="BLACK" strokeType="INSIDE" width="57.0" />
+      <Label fx:id="score_label" layoutX="123.0" layoutY="62.0" prefHeight="54.0" prefWidth="50.0" text="   0" textFill="WHITE">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="12.0" layoutX="214.0" layoutY="484.0" stroke="BLACK" strokeType="INSIDE" width="11.0" />
+      <ImageView fitHeight="33.0" fitWidth="33.0" layoutX="51.0" layoutY="454.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/character_stickhero_javafx.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="35.0" fitWidth="33.0" layoutX="1.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/pause_button.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="38.0" fitWidth="42.0" layoutX="283.0" layoutY="-5.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/cherry_javafx.png" />
+         </image>
+      </ImageView>
+      <Label id="cherry_score" layoutX="258.0" layoutY="1.0" prefHeight="26.0" prefWidth="25.0" text="22" textFill="WHITE">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

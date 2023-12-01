@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="668.0" prefWidth="314.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ap_project.GameStartController">
+   <children>
+      <ImageView fitHeight="694.0" fitWidth="314.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/stickhero1_javafx.png" />
+         </image>
+      </ImageView>
+      <Circle fill="#ff0303" layoutX="153.0" layoutY="291.0" onMouseClicked="#handleButtonClick" radius="61.0" stroke="BLACK" strokeType="INSIDE" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="122.0" layoutX="114.0" layoutY="548.0" stroke="BLACK" strokeType="INSIDE" width="86.0" />
+      <ImageView fitHeight="85.0" fitWidth="78.0" layoutX="114.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/character_stickhero_javafx.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="117.0" layoutY="258.0" onMouseClicked="#handleButtonClick" prefHeight="66.0" prefWidth="88.0" text="PLAY" textFill="#fafafa">
+         <font>
+            <Font size="34.0" />
+         </font>
+      </Label>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>
