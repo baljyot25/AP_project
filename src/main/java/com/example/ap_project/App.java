@@ -29,6 +29,14 @@ public class App extends Application {
 
     }
 
+    private void handleMousePress(MouseEvent event) {
+        double mouseX = event.getScreenX();
+        double mouseY = event.getScreenY();
+
+        System.out.println("Mouse Pressed at: (" + mouseX + ", " + mouseY + ")");
+        // Perform your desired actions here
+    }
+
     private void playsoundThread()
     {
 
