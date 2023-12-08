@@ -15,6 +15,10 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     Image image;
     ImageView imageView;
 
+    public ImageView getImageView() {
+        return imageView;
+    }
+
     public Hero(){
         image = new Image("C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png");
         imageView= new ImageView(image);
@@ -30,7 +34,7 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     {
         imageView.setX(r.getX()+r.getWidth()-36);
         imageView.setY(454);
-        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(2), imageView);
+        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), imageView);
         imageTransition.setFromX(position);
         return imageTransition;
 

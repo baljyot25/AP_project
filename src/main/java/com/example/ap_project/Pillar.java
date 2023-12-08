@@ -36,7 +36,15 @@ public class Pillar extends PositionDimension implements Collidable {
 
     }
 
+    public Pair<TranslateTransition,Rectangle> Transition(int start_position ,int end_position)
 
+    {
+        this.set_coordinate(start_position,ycordinate);
+        TranslateTransition transition = new TranslateTransition(Duration.millis(600), rectangle);
+
+        transition.setByX(-xcordinate+end_position);
+        return new Pair<>(transition,rectangle);
+    }
     public void add_to_screen(Pane pane, int start_position,int end_position,Hero hero) {
 //        //it will add itself to the given screen
 //        pane.getChildren().add(rectangle);
@@ -45,10 +53,10 @@ public class Pillar extends PositionDimension implements Collidable {
 //        ycordinate=484;
 //        rectangle.setLayoutX(xcordinate);  // X-coordinate
 //        rectangle.setLayoutY(ycordinate);
+        this.set_coordinate(start_position,ycordinate);
+        TranslateTransition transition = new TranslateTransition(Duration.millis(600), rectangle);
 
-        TranslateTransition transition = new TranslateTransition(Duration.millis(2000), rectangle);
-
-        transition.setByX(-xcordinate);
+        transition.setByX(-xcordinate+end_position);
 
         TranslateTransition imageTransition=hero.returnTransition(xcordinate,rectangle);
         imageTransition.setByX(-xcordinate);
@@ -66,10 +74,12 @@ public class Pillar extends PositionDimension implements Collidable {
         pane.getChildren().add(rectangle);
         pane.getChildren().add(hero.imageView);//need to add getter here
 
-        ParallelTransition parallelTransition = new ParallelTransition(transition, imageTransition);
+//        ParallelTransition parallelTransition = new ParallelTransition(transition, imageTransition);
 
         // Play the parallel transition
-        parallelTransition.play();
+        transition.play();
+        imageTransition.play();
+//        parallelTransition.play();
     }
 
 

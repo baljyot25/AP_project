@@ -4,6 +4,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 public abstract class PositionDimension {
+    public int getXcordinate() {
+        return xcordinate;
+    }
+
     protected int width,height,xcordinate,ycordinate;
     protected Color color;
 

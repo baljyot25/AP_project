@@ -2,8 +2,10 @@ package com.example.ap_project;
 
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -62,6 +64,7 @@ public class GameSceneController implements MousePress {
     private ScaleTransition scaleTransition;
 
     private static int prevpillar=0;
+    private Hero hero;
 
     private ArrayList<Pillar> pillars=new ArrayList<>();
 
@@ -90,8 +93,17 @@ public class GameSceneController implements MousePress {
         pillars.add(new Pillar(184,50,Color.BLACK,316,484));
         pillars.add(new Pillar(184,70,Color.BLACK,316,484));
         System.out.println(pillars);
+        hero=new Hero();
 
-        pillars.get(0).add_to_screen(pane,114,0,new Hero());
+
+        Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
+
+        pane.getChildren().add(pillarpair.second());
+        pillarpair.first().play();
+
+//        Pair<TranslateTransition,Rectangle> pillarpair
+
+//        pillars.get(0).add_to_screen(pane,200,100,hero);
 //        AddRandomPillar();
 
 
