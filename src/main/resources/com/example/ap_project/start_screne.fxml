@@ -12,14 +12,14 @@
    <children>
       <ImageView fitHeight="694.0" fitWidth="314.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../images/stickhero1_javafx.png" />
+            <Image url="@images/stickhero1_javafx.png" />
          </image>
       </ImageView>
       <Circle fill="#ff0303" layoutX="153.0" layoutY="291.0" onMouseClicked="#handleButtonClick" radius="61.0" stroke="BLACK" strokeType="INSIDE" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" height="122.0" layoutX="114.0" layoutY="548.0" stroke="BLACK" strokeType="INSIDE" width="86.0" />
       <ImageView fitHeight="85.0" fitWidth="78.0" layoutX="114.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../images/character_stickhero_javafx.png" />
+            <Image url="@images/character_stickhero_javafx.png" />
          </image>
       </ImageView>
       <Label layoutX="117.0" layoutY="258.0" onMouseClicked="#handleButtonClick" prefHeight="66.0" prefWidth="88.0" text="PLAY" textFill="#fafafa">

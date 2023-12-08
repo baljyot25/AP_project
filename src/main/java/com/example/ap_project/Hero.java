@@ -6,8 +6,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Hero extends PositionDimension implements Collidable , MousePress {
     private boolean positionInverted;
@@ -19,14 +26,54 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         return imageView;
     }
 
+    private static void printDirectoryContents(Path directory) throws IOException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            for (Path path : stream) {
+                System.out.println(path.getFileName());
+                if (Files.isDirectory(path)) {
+                    printDirectoryContents(path);
+                }
+            }
+        }
+    }
     public Hero(){
-        image = new Image("C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png");
+//        String absolutePathString = "C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png";
+//        Path absolutePath = Paths.get(absolutePathString);
+//
+//        // Convert absolute path to relative path
+//        Path relativePath = convertToRelativePath(absolutePath);
+//        System.out.println("Relative Path: " + relativePath);
+
+        // Convert relative path back to absolute path
+        Path currentPath = Paths.get(System.getProperty("user.dir"));
+
+        // Example absolute path
+        Path absolutePath = Paths.get("C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png");
+
+        // Relativize the absolute path to the current working directory
+        Path relativePath = currentPath.relativize(absolutePath);
+
+        // Print the relative path
+        System.out.println("Relative Path: " + relativePath);
+
+
+//        image = new Image(String.valueOf(currentPath.resolve("src").resolve("main").resolve("resources").resolve("images").resolve("character_stickhero_javafx.png")));
+        image=new Image(getClass().getResourceAsStream("images/character_stickhero_javafx.png"));
         imageView= new ImageView(image);
         imageView.setFitWidth(33);
         imageView.setFitHeight(30);
 
     }
 
+    private static Path convertToRelativePath(Path absolutePath) {
+        // Assuming there is a base directory, for example, the current working directory
+        Path baseDirectory = Paths.get(System.getProperty("user.dir"));
+
+        // Resolve the relative path against the base directory
+        Path relativePath = baseDirectory.relativize(absolutePath);
+
+        return relativePath;
+    }
 
 
 

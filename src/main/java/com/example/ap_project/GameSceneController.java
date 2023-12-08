@@ -103,7 +103,8 @@ public class GameSceneController implements MousePress {
             rotation.pivotXProperty().bind(rod.startXProperty());
             rotation.pivotYProperty().bind(rod.startYProperty());
             rod.getTransforms().add(rotation);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, new KeyValue(rotation.angleProperty(), 0)), new KeyFrame(Duration.seconds(0.5), new KeyValue(rotation.angleProperty(), 90)));
+            Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, new KeyValue(rotation.angleProperty(), 0)),
+                    new KeyFrame(Duration.seconds(0.5), new KeyValue(rotation.angleProperty(), 90)));
             timeline.setOnFinished(e -> makeHeroMove());
             timeline.play();
             System.out.println("TIME LINE PLAYED");
