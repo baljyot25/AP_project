@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -76,11 +77,12 @@ public class GameSceneController implements MousePress {
         return prevpillar;
     }
 
-    public void AddRandomPillar()
+    public Pillar AddRandomPillar()
     {
         //316 max reached
         Random r=new Random();
         Pillar p=pillars.get(r.nextInt(pillars.size()));
+        return p;
 
     }
 
@@ -95,11 +97,19 @@ public class GameSceneController implements MousePress {
         System.out.println(pillars);
         hero=new Hero();
 
-
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
+        Pair<TranslateTransition, ImageView> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
+        Pillar p2=this.AddRandomPillar();
+
+
+
+        pane.getChildren().add(heropair.second());
 
         pane.getChildren().add(pillarpair.second());
+        heropair.first().play();
         pillarpair.first().play();
+
+
 
 //        Pair<TranslateTransition,Rectangle> pillarpair
 

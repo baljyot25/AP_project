@@ -39,6 +39,7 @@ public class Pillar extends PositionDimension implements Collidable {
     public Pair<TranslateTransition,Rectangle> Transition(int start_position ,int end_position)
 
     {
+//        System.out.println(this.rectangle.getX());
         this.set_coordinate(start_position,ycordinate);
         TranslateTransition transition = new TranslateTransition(Duration.millis(600), rectangle);
 
@@ -58,8 +59,8 @@ public class Pillar extends PositionDimension implements Collidable {
 
         transition.setByX(-xcordinate+end_position);
 
-        TranslateTransition imageTransition=hero.returnTransition(xcordinate,rectangle);
-        imageTransition.setByX(-xcordinate);
+//        TranslateTransition imageTransition=hero.returnTransition(xcordinate,rectangle);
+//        imageTransition.setByX(-xcordinate);
 //        transition.setCycleCount((int) 4f);
 //        transition.setAutoReverse(true);
 //        set_coordinate(114,484);
@@ -78,7 +79,7 @@ public class Pillar extends PositionDimension implements Collidable {
 
         // Play the parallel transition
         transition.play();
-        imageTransition.play();
+//        imageTransition.play();
 //        parallelTransition.play();
     }
 

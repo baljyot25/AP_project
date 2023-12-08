@@ -30,13 +30,14 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
 
 
-    public TranslateTransition  returnTransition(int position, Rectangle r)
+    public Pair<TranslateTransition,ImageView>  returnTransition(int position, Rectangle r)
     {
         imageView.setX(r.getX()+r.getWidth()-36);
         imageView.setY(454);
         TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), imageView);
         imageTransition.setFromX(position);
-        return imageTransition;
+        imageTransition.setToX(0);
+        return new Pair<>(imageTransition,imageView);
 
     }
 
