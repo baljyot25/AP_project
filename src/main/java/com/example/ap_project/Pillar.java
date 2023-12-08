@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-public class Pillar extends PositionDimension implements Collidable {
+public class Pillar extends PositionDimension implements Collidable,Cloneable {
     protected Rectangle rectangle;
     public Pillar(){}
     public Pillar(int height,int width, Color color,int xcord,int ycord)
@@ -83,6 +83,14 @@ public class Pillar extends PositionDimension implements Collidable {
 //        parallelTransition.play();
     }
 
+    public Pillar clone()
+    {
+        try {
+            return (Pillar) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     @Override

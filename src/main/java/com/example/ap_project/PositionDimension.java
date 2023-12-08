@@ -12,4 +12,8 @@ public abstract class PositionDimension {
     protected Color color;
 
     public abstract void add_to_screen(Pane pane,int start_position,int end_position,Hero hero);
+
+    public int width() {
+        return width;
+    }
 }
