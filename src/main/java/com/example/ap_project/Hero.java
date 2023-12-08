@@ -1,7 +1,11 @@
 
 package com.example.ap_project;
 
+import javafx.animation.ParallelTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,47 +25,24 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     private Sound death_sound ; /*="sample_audio.mp3";*/;
     Image image;
     ImageView imageView;
-
+    Rectangle leg1;
+    Rectangle leg2;
+    Group group;
     public ImageView getImageView() {
         return imageView;
     }
 
-    private static void printDirectoryContents(Path directory) throws IOException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
-            for (Path path : stream) {
-                System.out.println(path.getFileName());
-                if (Files.isDirectory(path)) {
-                    printDirectoryContents(path);
-                }
-            }
-        }
-    }
+
     public Hero(){
-//        String absolutePathString = "C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png";
-//        Path absolutePath = Paths.get(absolutePathString);
-//
-//        // Convert absolute path to relative path
-//        Path relativePath = convertToRelativePath(absolutePath);
-//        System.out.println("Relative Path: " + relativePath);
-
-        // Convert relative path back to absolute path
-        Path currentPath = Paths.get(System.getProperty("user.dir"));
-
-        // Example absolute path
-        Path absolutePath = Paths.get("C:\\Users\\baljyot\\OneDrive\\Desktop\\Ap_project\\src\\main\\resources\\images\\character_stickhero_javafx.png");
-
-        // Relativize the absolute path to the current working directory
-        Path relativePath = currentPath.relativize(absolutePath);
-
-        // Print the relative path
-        System.out.println("Relative Path: " + relativePath);
 
 
 //        image = new Image(String.valueOf(currentPath.resolve("src").resolve("main").resolve("resources").resolve("images").resolve("character_stickhero_javafx.png")));
-        image=new Image(getClass().getResourceAsStream("images/character_stickhero_javafx.png"));
+        image=new Image(getClass().getResourceAsStream("images/hero_draft2.png"));
         imageView= new ImageView(image);
         imageView.setFitWidth(33);
         imageView.setFitHeight(30);
+        leg1=new Rectangle(3,7);
+        leg2=new Rectangle(3,7);
 
     }
 
@@ -77,14 +58,21 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
 
 
-    public Pair<TranslateTransition,ImageView>  returnTransition(int position, Rectangle r)
+    public Pair<TranslateTransition,Group>  returnTransition(int position, Rectangle r)
     {
         imageView.setX(r.getX()+r.getWidth()-36);
         imageView.setY(454);
-        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), imageView);
+        leg1.setX(r.getX()+r.getWidth()-36+11);
+        leg1.setY(454+25);
+        leg2.setY(454+25);
+        leg2.setX(r.getX()+r.getWidth()-36+20);
+
+        group= new Group(imageView,leg1,leg2);
+
+        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), group);
         imageTransition.setFromX(position);
         imageTransition.setToX(0);
-        return new Pair<>(imageTransition,imageView);
+        return new Pair<>(imageTransition,group);
 
     }
 
@@ -112,11 +100,70 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         this.invertHero();
     }
 
-    public void run() {
+    public Rectangle getLeg1() {
+        return leg1;
+    }
+
+    public Rectangle getLeg2() {
+        return leg2;
+    }
+
+    public Pair<TranslateTransition,ParallelTransition> move(double distanceToMove) {
+        TranslateTransition translate = new TranslateTransition();
+
+//        System.out.println("hero x is " + hero.getX());
+
+        //shifting the X coordinate of the centre of the circle by 400
+        translate.setByX(distanceToMove + 18);
+
+        //setting the duration for the Translate transition
+        translate.setDuration(Duration.millis(1000));
+
+        //setting cycle count for the Translate transition
+        translate.setCycleCount(1);
+
+
+        //setting Circle as the node onto which the transition will be applied
+        translate.setNode(group);
+
+        RotateTransition rotateTransition = new RotateTransition(Duration.seconds(0.5), leg1);
+        rotateTransition.setAutoReverse(true); // Rotate back and forth
+        rotateTransition.setToAngle(15); // Rotate by 45 degrees
+        rotateTransition.setFromAngle(-45);
+
+
+
+
+
+
+
+
+        rotateTransition.setCycleCount(Timeline.INDEFINITE);
+        RotateTransition rotateTransition2 = new RotateTransition(Duration.seconds(0.5), leg2);
+
+        rotateTransition2.setAutoReverse(true); // Rotate back and forth
+        rotateTransition2.setToAngle(-15); // Rotate by 45 degrees
+        rotateTransition2.setFromAngle(45);
+        rotateTransition2.setCycleCount(Timeline.INDEFINITE);
+
+        // Set an onFinished handler for the TranslateTransition
+
+
+        // Create a ParallelTransition to play both transitions simultaneously
+
+        ParallelTransition parallelTransition = new ParallelTransition(translate, rotateTransition2,rotateTransition);
+        return new Pair<>(translate,parallelTransition);
+
+
+
+
 
     }
 
-    public void onDeath() {
+    public TranslateTransition onDeath() {
+        TranslateTransition translateTransition=new TranslateTransition(Duration.seconds(2), group);
+        translateTransition.setByY(454);
+        return translateTransition;
 
     }
     private void deathSound()

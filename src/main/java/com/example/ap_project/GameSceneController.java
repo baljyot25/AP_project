@@ -2,6 +2,7 @@ package com.example.ap_project;
 
 import javafx.animation.*;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -66,7 +67,7 @@ public class GameSceneController implements MousePress {
             rod=new Line(curStickX,curStickY,curStickX,curStickY);
             pane.getChildren().add(rod);
             rod.setVisible(false);
-            rod.setStrokeWidth(5);
+            rod.setStrokeWidth(3);
 
         }
         public void setVisible(Boolean b)
@@ -122,7 +123,8 @@ public class GameSceneController implements MousePress {
         return p;
 
     }
-
+    Rectangle r1;
+    Rectangle r2;
 
     @FXML
     private void initialize() {
@@ -137,7 +139,7 @@ public class GameSceneController implements MousePress {
         hero=new Hero();
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
-        Pair<TranslateTransition, ImageView> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
+        Pair<TranslateTransition, Group> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
 
         Pillar p2=this.AddRandomPillar();
         while(p2==pillars.get(0))
@@ -154,6 +156,8 @@ public class GameSceneController implements MousePress {
         Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(p2.getXcordinate(),r.nextInt((max - min) ) + min);
 //        Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(p2.getXcordinate(),314-p2.width());
 
+
+
         pane.getChildren().add(pillarpair2.second());
         pane.getChildren().add(heropair.second());
 
@@ -162,10 +166,14 @@ public class GameSceneController implements MousePress {
         heropair.first().play();
         pillarpair.first().play();
         pillarpair2.first().play();
+        r1=pillarpair.second();
+        r2=pillarpair2.second();
 
         curStickX = pillarpair.second().getWidth();
         curStickY = SCREENHEIGHT - pillarpair.second().getHeight();
         stick=new Stick(curStickX,curStickY);
+//        System.out.println(pillarpair.second().getX());
+
         //adding timelines
         increaseTimeline = new Timeline(new KeyFrame(Duration.millis(16), event -> stick.extendStick()));
         increaseTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -189,10 +197,87 @@ public class GameSceneController implements MousePress {
             System.out.println("Mouse Released!");
             stick.stickFall();
             increaseTimeline.pause();
+
         }
 
     }
     private void makeHeroMove() {
+        double rec1X= r1.localToScreen(0, 0).getX();
+        double rec1Y = r1.localToScreen(0, 0).getY();
+        double rec2X = r2.localToScreen(0, 0).getX();
+        double rec2Y = r2.localToScreen(0, 0).getY();
+        double rec1width=r1.getWidth();
+        double rec2width=r2.getWidth();
+
+        System.out.println(r1.getWidth());
+        System.out.println("Rectangle position on screen: X=" + rec1X + ", Y=" + rec1Y);
+        System.out.println("Rectangle position on screen: X=" + (rec1X+r1.getWidth()) + ", Y=" + rec1Y);
+
+
+        System.out.println("Rectangle position on screen: X=" + rec2X + ", Y=" + rec2Y);
+        System.out.println("Rectangle position on screen: X=" + (rec2X+r2.getWidth()) + ", Y=" + rec2Y);
+        System.out.println(stick.stickLength);
+        TranslateTransition deathTransition=hero.onDeath();
+
+        if (rec1X+rec1width+stick.stickLength+1.9>=rec2X  && rec1X+rec1width+stick.stickLength+1.9<=rec2X+rec2width)
+        {
+            System.out.println("chalega");
+            Pair<TranslateTransition,ParallelTransition>p=hero.move(rec2X+rec2width-(rec1X+rec1width)-14);
+            TranslateTransition translate=p.first();
+            ParallelTransition parallelTransition=p.second();
+            Rectangle leg1=hero.getLeg1();
+            Rectangle leg2=hero.getLeg2();
+            translate.setOnFinished(event -> {
+                // Stop the RotateTransition when translation is finished
+
+                parallelTransition.stop();
+                RotateTransition r=new RotateTransition(Duration.seconds(0.0001), leg1);
+                r.setToAngle(0);
+//            r.setAutoReverse(true); // Rotate back and forth
+//            r.setCycleCount(Timeline.INDEFINITE);
+                r.play();
+                r=new RotateTransition(Duration.seconds(0.0001), leg2);
+                r.setToAngle(0);
+//            r.setAutoReverse(true); // Rotate back and forth
+//            r.setCycleCount(Timeline.INDEFINITE);
+                r.play();
+            });
+            parallelTransition.play();
+
+        }
+        else {
+            System.out.println("nahi chalega");
+            Pair<TranslateTransition,ParallelTransition>p=hero.move(stick.stickLength);
+            TranslateTransition translate=p.first();
+            ParallelTransition parallelTransition=p.second();
+            Rectangle leg1=hero.getLeg1();
+            Rectangle leg2=hero.getLeg2();
+            translate.setOnFinished(event -> {
+                // Stop the RotateTransition when translation is finished
+
+                parallelTransition.stop();
+                RotateTransition r=new RotateTransition(Duration.seconds(0.0001), leg1);
+                r.setToAngle(0);
+//            r.setAutoReverse(true); // Rotate back and forth
+//            r.setCycleCount(Timeline.INDEFINITE);
+                r.play();
+                r=new RotateTransition(Duration.seconds(0.0001), leg2);
+                r.setToAngle(0);
+//            r.setAutoReverse(true); // Rotate back and forth
+//            r.setCycleCount(Timeline.INDEFINITE);
+                r.play();
+                r.setOnFinished(event1->{
+                    deathTransition.play();
+                });
+            });
+
+            parallelTransition.play();
+
+
+        }
+
+
+
 //        System.out.println("Hero move called!");
 //        //Instantiating TranslateTransition class
 //        TranslateTransition translate = new TranslateTransition();
