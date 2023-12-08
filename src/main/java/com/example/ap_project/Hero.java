@@ -158,9 +158,15 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
 
 
+
+    }
+
+    public Group getGroup() {
+        return group;
     }
 
     public TranslateTransition onDeath() {
+
         TranslateTransition translateTransition=new TranslateTransition(Duration.seconds(2), group);
         translateTransition.setByY(454);
         return translateTransition;

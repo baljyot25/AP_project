@@ -267,6 +267,7 @@ public class GameSceneController implements MousePress {
 //            r.setCycleCount(Timeline.INDEFINITE);
                 r.play();
                 r.setOnFinished(event1->{
+
                     deathTransition.play();
                 });
             });
@@ -315,15 +316,17 @@ public class GameSceneController implements MousePress {
             increaseTimeline.play();
         } else if (mousePressed > 1){
 
+
 //
-//            System.out.println("Rotating!");
-//            hero.setRotate(hero.getRotate() + 180);
-//            heroInverted = !heroInverted;
-//            if (!heroInverted) {
-//                hero.setY(hero.getY() - 30);
-//            } else {
-//                hero.setY(hero.getY() + 30);
-//            }
+            System.out.println("Rotating!");
+            Group group =hero.getGroup();
+            group.setRotate(group.getRotate() + 180);
+            heroInverted = !heroInverted;
+            if (!heroInverted) {
+                group.setLayoutY(group.getLayoutY() - 30);
+            } else {
+                group.setLayoutY(group.getLayoutY() + 30);
+            }
         }
 
     }
