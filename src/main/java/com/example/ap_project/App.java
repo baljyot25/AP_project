@@ -10,15 +10,22 @@ import javafx.scene.media.AudioClip;
 
 import java.io.IOException;
 
-public class App extends Application {
+public class App extends Application{
     private Sound audioClip;//we might create a thread so that this bg will run continously.
+    private Sound bgMusic;
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("start_screne.fxml"));
-        System.out.println("fxml load");
         Scene scene = new Scene(fxmlLoader.load(), 314, 665);
-        System.out.println("idhar hua");
-        stage.setTitle("Stick Hero");
+
+        new Thread(() -> {
+            System.out.println("Thread created!\n");
+            bgMusic = new Sound("bgMusic.mp3");
+            bgMusic.playMusic();
+        }).start();
+
+
+
         stage.setScene(scene);
         stage.show();
     }
@@ -34,8 +41,6 @@ public class App extends Application {
     private void handleMousePress(MouseEvent event) {
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
-
-        System.out.println("Mouse Pressed at: (" + mouseX + ", " + mouseY + ")");
         // Perform your desired actions here
     }
 
@@ -44,4 +49,6 @@ public class App extends Application {
 
 
     }
+
+
 }
