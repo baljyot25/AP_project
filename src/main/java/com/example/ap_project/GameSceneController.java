@@ -283,11 +283,12 @@ public class GameSceneController implements MousePress {
     }
 
     public void handlePillarCollision() {
+        System.out.println("Handling pillar collision!\n");
         TranslateTransition deathTransition=hero.onDeath();
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) r2.getScene().getWindow());
         });
         deathTransition.play();
     }
@@ -301,15 +302,19 @@ public class GameSceneController implements MousePress {
             System.out.println("cherry claimed val is " + cherry.isClaimed());
         }
         if (hero.getGroup().getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()) && !obstacle.didCrash()) {
+            heroTransition.pause();
             System.out.println("Collision Detected!");
             System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()));
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
             handleObstacleCollision();
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
         }
-        if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent())) {
+        if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent()) && !collidedWithPillar) {
+            collidedWithPillar = true;
+            heroTransition.stop();
             System.out.println("Pillar Collision Detected!");
             handlePillarCollision();
+            System.out.println("Pillar collision handled!");
         }
     }
 
@@ -320,6 +325,7 @@ public class GameSceneController implements MousePress {
     double firstwidth;
     @FXML
     private void initialize() {
+        this.collidedWithPillar = false;
         pause_button.setOnMouseClicked(event -> {
             System.out.println("Image clicked");
             // Consume the event to prevent it from being propagated to the parent
