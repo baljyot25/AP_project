@@ -32,8 +32,12 @@ public class Score {
         current_score+=1;
     }
 
-    public void  is_best()
+    public static  void  is_best()
     {
+        if (current_score>=best_score)
+        {
+            best_score=current_score;
+        }
         //checks if current score is the best score;
     }
 

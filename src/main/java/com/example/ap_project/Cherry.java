@@ -54,6 +54,18 @@ public class Cherry implements Collidable {
         return false;
     }
 
+    public int getCherriesToRevive() {
+        return cherriesToRevive;
+    }
+
+    public static int getCherries() {
+        return cherries;
+    }
+
+    public static void setCherries(int cherries) {
+        Cherry.cherries = cherries;
+    }
+
     @Override
     public void onCollision() {
         this.claimed = true;

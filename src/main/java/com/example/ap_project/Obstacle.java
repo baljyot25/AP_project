@@ -43,4 +43,3 @@ public class Obstacle implements Collidable {
         this.imageView.setVisible(false);
     }
 }
-

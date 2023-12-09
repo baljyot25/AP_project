@@ -3,6 +3,7 @@ package com.example.ap_project;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -14,6 +15,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -75,6 +77,101 @@ public class GameSceneController implements MousePress {
     }
     private double curStickY;
     private double curStickX;
+
+    @FXML
+    private ImageView pause_button;
+
+    public void pausegame() {
+        if (heroTransition==null)
+        {
+            return;
+        }
+        heroTransition.pause();
+
+        Rectangle re=new Rectangle(0,0,314,SCREENHEIGHT);
+        Rectangle score=new Rectangle(240,183,Color.WHITE);score.setLayoutY(164);score.setLayoutX(36);
+        re.setOpacity(0.5);
+
+        Label currentScoreLabel= new Label("CURRENT SCORE");
+        Label bestLabel=new Label("BEST");
+        Label currentScoreValueLabel=new Label(String.valueOf(Score.getCurrent_score()));
+        Label bestValueLabel=new Label(String.valueOf(Score.getBest_score()));
+
+        currentScoreLabel.setLayoutX(93.0);
+        currentScoreLabel.setLayoutY(175.0);
+
+        bestLabel.setLayoutX(131.0);
+        bestLabel.setLayoutY(255.0);
+
+        currentScoreValueLabel.setLayoutX(131.0);
+        currentScoreValueLabel.setLayoutY(206.0);
+
+        bestValueLabel.setLayoutX(131.0);
+        bestValueLabel.setLayoutY(285.0);
+        Font boldFont = Font.font("System Bold", 16.0);
+
+        currentScoreLabel.setFont(boldFont);
+        bestLabel.setFont(boldFont);
+        currentScoreValueLabel.setFont(new Font(32.0));
+        bestValueLabel.setFont(new Font(32.0));
+
+        ImageView playImageView =new ImageView(new Image(getClass().getResourceAsStream("images/play_button_javafx.png")));
+        ImageView homeImageView=new ImageView(new Image(getClass().getResourceAsStream("images/home_javafx.png")));
+        ImageView restartImageView=new ImageView(new Image(getClass().getResourceAsStream("images/restart_javafx.png")));
+        homeImageView.setLayoutX(34.0);
+        homeImageView.setLayoutY(460.0);
+
+        restartImageView.setLayoutX(218.0);
+        restartImageView.setLayoutY(468.0);
+
+        playImageView.setLayoutX(127.0);
+        playImageView.setLayoutY(470.0);
+
+        homeImageView.setFitWidth(73);
+        homeImageView.setFitHeight(74);
+
+        restartImageView.setFitWidth(63);
+        restartImageView.setFitHeight(65);
+
+        playImageView.setFitWidth(63);
+        playImageView.setFitHeight(56);
+        homeImageView.setOnMouseClicked(this::handleHomeClick);
+        restartImageView.setOnMouseClicked(this::handleRestartClick);
+        playImageView.setOnMouseClicked(event -> {
+            // Handle play image click
+            System.out.println("Play image clicked");
+
+            // Remove nodes related to the Play image
+            pane.getChildren().removeAll(re, score, currentScoreLabel, bestLabel, currentScoreValueLabel, bestValueLabel,
+                    homeImageView, restartImageView, playImageView);
+            heroTransition.play();
+        });
+
+        pane.getChildren().add(re);
+        pane.getChildren().add(score);
+        pane.getChildren().addAll(currentScoreLabel, bestLabel, currentScoreValueLabel, bestValueLabel);
+        pane.getChildren().addAll(homeImageView, restartImageView, playImageView);
+    }
+    ParallelTransition heroTransition;
+    private void handleHomeClick(MouseEvent event) {
+        // Handle home image click
+        System.out.println("Home image clicked");
+        Score.setCurrent_score(0);
+        SceneLoader s=SceneLoader.getInstance();
+
+        s.loadscene(pane,"start_screne.fxml", (Stage) ((Node) event.getSource()).getScene().getWindow());
+    }
+
+    private void handleRestartClick(MouseEvent event) {
+        // Handle restart image click
+        System.out.println("Restart image clicked");
+        Score.setCurrent_score(0);
+        SceneLoader s=SceneLoader.getInstance();
+
+        s.loadscene(pane,"game_scene.fxml", (Stage) ((Node) event.getSource()).getScene().getWindow());
+    }
+
+
     private class Stick extends PositionDimension implements Collidable
     {
         Line rod;
@@ -223,6 +320,14 @@ public class GameSceneController implements MousePress {
     double firstwidth;
     @FXML
     private void initialize() {
+        pause_button.setOnMouseClicked(event -> {
+            System.out.println("Image clicked");
+            // Consume the event to prevent it from being propagated to the parent
+            System.out.println("bruhhhhh");;
+            event.consume();
+            // Call the specific function to handle the image click
+            pausegame();
+        });
         this.initializeSounds();
 //        bgMusic.playMusic();
         score_label.setText(String.valueOf(Score.getCurrent_score()));
@@ -507,13 +612,13 @@ public class GameSceneController implements MousePress {
 
             Pair<TranslateTransition,ParallelTransition>p=hero.move(rightTopX-hero.getImageView().getX()-30,false);
             TranslateTransition translate=p.first();
-            ParallelTransition parallelTransition=p.second();
+             heroTransition=p.second();
             Rectangle leg1=hero.getLeg1();
             Rectangle leg2=hero.getLeg2();
             translate.setOnFinished(event -> {
                 // Stop the RotateTransition when translation is finished
 
-                parallelTransition.stop();
+                heroTransition.stop();
                 RotateTransition r=new RotateTransition(Duration.seconds(0.0001), leg1);
                 r.setToAngle(0);
 //            r.setAutoReverse(true); // Rotate back and forth
@@ -529,20 +634,20 @@ public class GameSceneController implements MousePress {
                     pillarTransition();
                 });
             });
-            parallelTransition.play();
+            heroTransition.play();
 
         }
         else {
             System.out.println("nahi chalega");
             Pair<TranslateTransition,ParallelTransition>p=hero.move(stick.stickLength,true);
             TranslateTransition translate=p.first();
-            ParallelTransition parallelTransition=p.second();
+             heroTransition=p.second();
             Rectangle leg1=hero.getLeg1();
             Rectangle leg2=hero.getLeg2();
             translate.setOnFinished(event -> {
                 // Stop the RotateTransition when translation is finished
 
-                parallelTransition.stop();
+                heroTransition.stop();
                 RotateTransition r=new RotateTransition(Duration.seconds(0.0001), leg1);
                 r.setToAngle(0);
 //            r.setAutoReverse(true); // Rotate back and forth
@@ -559,36 +664,13 @@ public class GameSceneController implements MousePress {
                 });
             });
 
-            parallelTransition.play();
+            heroTransition.play();
 
 
         }
 
 
 
-//        System.out.println("Hero move called!");
-//        //Instantiating TranslateTransition class
-//        TranslateTransition translate = new TranslateTransition();
-//
-//        System.out.println("hero x is " + hero.getX());
-//        int distToMove = (int) (stickLength + (87 - hero.getX()));
-//        //shifting the X coordinate of the centre of the circle by 400
-//        translate.setByX(stickLength + 18);
-//
-//        //setting the duration for the Translate transition
-//        translate.setDuration(Duration.millis(2000));
-//
-//        //setting cycle count for the Translate transition
-//        translate.setCycleCount(1);
-//
-//
-//        //setting Circle as the node onto which the transition will be applied
-//        translate.setNode(hero);
-//
-//        //playing the transition
-//        translate.play();
-//        translate.setOnFinished(e -> setHeroReachedPillar());
-////        translate.stop();
     }
     public void handleMousePress(MouseEvent event) {
         if (heroReachedPillar) {
@@ -603,7 +685,7 @@ public class GameSceneController implements MousePress {
             stickSound.toggleMusic();
             increaseTimeline.play();
         } else if (mousePressed > 1){
-
+            System.out.println("rotatiin called");
 
 //
             System.out.println("Rotating!");
