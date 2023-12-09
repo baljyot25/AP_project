@@ -22,7 +22,7 @@ import java.nio.file.Paths;
 
 public class Hero extends PositionDimension implements Collidable , MousePress {
     private boolean positionInverted;
-    private Sound death_sound ; /*="sample_audio.mp3";*/;
+    private Sound deathSound ; /*="sample_audio.mp3";*/;
     Image image;
     ImageView imageView;
     Rectangle leg1;
@@ -35,7 +35,8 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
     public Hero(){
 
-
+        deathSound = Sound.getInstance("onDeath.mp3");
+        deathSound.setCycleTo(1);
 //        image = new Image(String.valueOf(currentPath.resolve("src").resolve("main").resolve("resources").resolve("images").resolve("character_stickhero_javafx.png")));
         image=new Image(getClass().getResourceAsStream("images/hero_draft2.png"));
         imageView= new ImageView(image);
@@ -184,9 +185,9 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
     }
 
-    private void deathSound()
+    public void playDeathSound()
     {
-
+        deathSound.playMusic();
     }
 
     @Override

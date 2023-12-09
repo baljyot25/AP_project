@@ -20,8 +20,8 @@ public class App extends Application{
 
         new Thread(() -> {
             System.out.println("Thread created!\n");
-            bgMusic = new Sound("bgMusic.mp3");
-//            bgMusic.playMusic();
+            bgMusic = Sound.getInstance("bgMusic.mp3");
+            bgMusic.playMusic();
         }).start();
 
 

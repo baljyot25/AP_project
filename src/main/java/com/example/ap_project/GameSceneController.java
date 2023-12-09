@@ -35,7 +35,7 @@ public class GameSceneController implements MousePress {
 
     @FXML
     private Label score_label;
-    private Sound stickSound, cherrySound, bgMusic, dropSound;
+    private Sound stickSound, cherrySound, dropSound;
     private Score score;
     private Cherry cherry;
     private Obstacle obstacle;
@@ -59,10 +59,11 @@ public class GameSceneController implements MousePress {
 
     private ArrayList<Pillar> pillars=new ArrayList<>();
     public void initializeSounds() {
-        bgMusic = new Sound("bgMusic.mp3");
-        cherrySound = new Sound("cherrySound.mp3", 1);
-        stickSound = new Sound("increaseStick.mp3");
-        dropSound = new Sound("perfectDrop.mp3", 1);
+        cherrySound = Sound.getInstance("cherrySound.mp3");
+        cherrySound.setCycleTo(1);
+        stickSound = Sound.getInstance("increaseStick.mp3");
+        dropSound = Sound.getInstance("perfectDrop.mp3");
+        dropSound.setCycleTo(1);
     }
 
 
@@ -280,6 +281,7 @@ public class GameSceneController implements MousePress {
             s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
         });
         deathTransition.play();
+        hero.playDeathSound();
     }
 
     public void handlePillarCollision() {
@@ -291,6 +293,7 @@ public class GameSceneController implements MousePress {
             s.loadscene(pane,"game_end_scene.fxml", (Stage) r2.getScene().getWindow());
         });
         deathTransition.play();
+        hero.playDeathSound();
     }
 
     public void checkCollision() {
@@ -393,7 +396,7 @@ public class GameSceneController implements MousePress {
         cherry.getImageView().setX(150);
         cherry.getImageView().setY(450);
         obstacle.getImageView().setX(170);
-        obstacle.getImageView().setY(450);
+        obstacle.getImageView().setY(700);
 
         pane.getChildren().add(pillarpair.second());
 
