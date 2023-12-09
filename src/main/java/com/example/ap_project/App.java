@@ -29,6 +29,8 @@ public class App extends Application {
 
     }
 
+
+
     private void handleMousePress(MouseEvent event) {
         double mouseX = event.getScreenX();
         double mouseY = event.getScreenY();
