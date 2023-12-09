@@ -1,4 +1,3 @@
-
 package com.example.ap_project;
 
 import javafx.animation.ParallelTransition;
@@ -10,48 +9,34 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Hero extends PositionDimension implements Collidable , MousePress {
+public class Hero extends PositionDimension implements Collidable, MousePress {
+    private final Sound deathSound; /*="sample_audio.mp3";*/
+    private Image image;
+    private ImageView imageView;
+    private Rectangle leg1;
+
+    private Rectangle leg2;
+    private Group group;
     private boolean positionInverted;
-    private Sound deathSound ; /*="sample_audio.mp3";*/;
-    Image image;
-    ImageView imageView;
-    Rectangle leg1;
-    Rectangle leg2;
-    Group group;
-    public ImageView getImageView() {
-        return imageView;
-    }
     private boolean heroInMotion = false;
 
-    public boolean isHeroInMotion() {
-        return this.heroInMotion;
-    }
-
-    public void setHeroInMotion(boolean b){
-        this.heroInMotion = b;
-    }
-
-    public Hero(){
+    public Hero() {
 
         deathSound = Sound.getInstance("onDeath.mp3");
         deathSound.setCycleTo(1);
 //        image = new Image(String.valueOf(currentPath.resolve("src").resolve("main").resolve("resources").resolve("images").resolve("character_stickhero_javafx.png")));
-        image=new Image(getClass().getResourceAsStream("images/hero_draft2.png"));
-        imageView= new ImageView(image);
+        image = new Image(getClass().getResourceAsStream("images/hero_draft2.png"));
+        imageView = new ImageView(image);
         imageView.setFitWidth(33);
         imageView.setFitHeight(30);
-        leg1=new Rectangle(3,7);
-        leg2=new Rectangle(3,7);
+        leg1 = new Rectangle(3, 7);
+        leg2 = new Rectangle(3, 7);
 
     }
 
@@ -65,23 +50,32 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         return relativePath;
     }
 
+    public ImageView getImageView() {
+        return imageView;
+    }
 
+    public boolean isHeroInMotion() {
+        return this.heroInMotion;
+    }
 
-    public Pair<TranslateTransition,Group>  returnTransition(int position, Rectangle r)
-    {
-        imageView.setX(r.getX()+r.getWidth()-36);
+    public void setHeroInMotion(boolean b) {
+        this.heroInMotion = b;
+    }
+
+    public Pair<TranslateTransition, Group> returnTransition(int position, Rectangle r) {
+        imageView.setX(r.getX() + r.getWidth() - 36);
         imageView.setY(454);
-        leg1.setX(r.getX()+r.getWidth()-36+11);
-        leg1.setY(454+25);
-        leg2.setY(454+25);
-        leg2.setX(r.getX()+r.getWidth()-36+20);
+        leg1.setX(r.getX() + r.getWidth() - 36 + 11);
+        leg1.setY(454 + 25);
+        leg2.setY(454 + 25);
+        leg2.setX(r.getX() + r.getWidth() - 36 + 20);
 
-        group= new Group(imageView,leg1,leg2);
+        group = new Group(imageView, leg1, leg2);
 
-        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), group);
+        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6), group);
         imageTransition.setFromX(position);
         imageTransition.setToX(0);
-        return new Pair<>(imageTransition,group);
+        return new Pair<>(imageTransition, group);
 
     }
 
@@ -105,7 +99,7 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         this.invertHero();
     }
 
-    public void handleMousePress(MouseEvent event){
+    public void handleMousePress(MouseEvent event) {
         this.invertHero();
     }
 
@@ -121,23 +115,21 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 ////        this.group.get
 //    }
 
-    public Pair<TranslateTransition,ParallelTransition> move(double distanceToMove,Boolean b) {
+    public Pair<TranslateTransition, ParallelTransition> move(double distanceToMove, Boolean b) {
         TranslateTransition translate = new TranslateTransition();
 
 //        System.out.println("hero x is " + hero.getX());
 
         //shifting the X coordinate of the centre of the circle by 400
-        if (b==false)
-        {
-            translate.setToX(distanceToMove );
-        }
-        else {
-            translate.setByX(distanceToMove+18);
+        if (!b) {
+            translate.setToX(distanceToMove);
+        } else {
+            translate.setByX(distanceToMove + 18);
         }
 
 
         //setting the duration for the Translate transition
-        translate.setDuration(Duration.millis(distanceToMove*20));
+        translate.setDuration(Duration.millis(distanceToMove * 20));
 
         //setting cycle count for the Translate transition
         translate.setCycleCount(1);
@@ -150,12 +142,6 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         rotateTransition.setAutoReverse(true); // Rotate back and forth
         rotateTransition.setToAngle(15); // Rotate by 45 degrees
         rotateTransition.setFromAngle(-45);
-
-
-
-
-
-
 
 
         rotateTransition.setCycleCount(Timeline.INDEFINITE);
@@ -171,12 +157,8 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
         // Create a ParallelTransition to play both transitions simultaneously
 
-        ParallelTransition parallelTransition = new ParallelTransition(translate, rotateTransition2,rotateTransition);
-        return new Pair<>(translate,parallelTransition);
-
-
-
-
+        ParallelTransition parallelTransition = new ParallelTransition(translate, rotateTransition2, rotateTransition);
+        return new Pair<>(translate, parallelTransition);
 
 
     }
@@ -186,21 +168,44 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     }
 
     public TranslateTransition onDeath() {
-        TranslateTransition translateTransition=new TranslateTransition(Duration.seconds(2), group);
+        TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(2), group);
         translateTransition.setByY(454);
         return translateTransition;
 
     }
 
-    public void playDeathSound()
-    {
+    public void playDeathSound() {
         deathSound.playMusic();
     }
 
     @Override
-    public void add_to_screen(Pane pane,int start_position,int end_position,Hero hero) {
+    public void add_to_screen(Pane pane, int start_position, int end_position, Hero hero) {
 
 
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
+
+    public void setLeg1(Rectangle leg1) {
+        this.leg1 = leg1;
+    }
+
+    public void setLeg2(Rectangle leg2) {
+        this.leg2 = leg2;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     private void moveHeroToPillarCenter(Pillar p) {

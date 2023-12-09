@@ -10,18 +10,9 @@ import java.util.Objects;
 
 
 public class Sound {
-    // Sound type ki ArrayList bgSound, onDeath sound array
-    private static Map<String, Sound> instances = new HashMap<String, Sound>();
+    private static final Map<String, Sound> instances = new HashMap<String, Sound>();
     private final Media media;
     private final MediaPlayer mediaPlayer;
-
-    public static Sound getInstance(String soundFileName) {
-        if (!instances.containsKey(soundFileName)) {
-            instances.put(soundFileName, new Sound(soundFileName));
-        }
-        return instances.get(soundFileName);
-    }
-
 
     public Sound(String soundName) {
         this.media = new Media(Objects.requireNonNull(getClass().getResource("audio/" + soundName)).toString());
@@ -29,10 +20,18 @@ public class Sound {
         this.mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     }
 
+
     public Sound(String soundName, int cycleCount) {
         this.media = new Media(Objects.requireNonNull(getClass().getResource("audio/" + soundName)).toString());
         this.mediaPlayer = new MediaPlayer(media);
         this.mediaPlayer.setCycleCount(cycleCount);
+    }
+
+    public static Sound getInstance(String soundFileName) {
+        if (!instances.containsKey(soundFileName)) {
+            instances.put(soundFileName, new Sound(soundFileName));
+        }
+        return instances.get(soundFileName);
     }
 
     public void setCycleTo(int newCycleCount) {

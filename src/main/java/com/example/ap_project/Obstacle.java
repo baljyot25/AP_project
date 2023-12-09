@@ -1,14 +1,22 @@
 package com.example.ap_project;
 
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Obstacle implements Collidable {
+    private final Image image;
+    private final ImageView imageView;
     private boolean crashed;
-    private Image image;
-    private ImageView imageView;
 
+
+    public Obstacle() {
+        this.crashed = false;
+        this.image = new Image(getClass().getResourceAsStream("images/obstacle_javafx.png"));
+        this.imageView = new ImageView(image);
+        this.imageView.setFitWidth(20);
+        this.imageView.setFitHeight(20);
+        setRandomPosition();
+    }
 
     public ImageView getImageView() {
         return this.imageView;
@@ -16,15 +24,6 @@ public class Obstacle implements Collidable {
 
     public boolean didCrash() {
         return this.crashed;
-    }
-
-    public Obstacle(){
-        this.crashed = false;
-        this.image=new Image(getClass().getResourceAsStream("images/obstacle_javafx.png"));
-        this.imageView= new ImageView(image);
-        this.imageView.setFitWidth(25);
-        this.imageView.setFitHeight(25);
-        setRandomPosition();
     }
 
     public void setRandomPosition() {
@@ -48,8 +47,8 @@ public class Obstacle implements Collidable {
     }
 
     public ImageView getNewImageView() {
-        Image image=new Image(getClass().getResourceAsStream("images/obstacle_javafx.png"));
-        ImageView imageView= new ImageView(image);
+        Image image = new Image(getClass().getResourceAsStream("images/obstacle_javafx.png"));
+        ImageView imageView = new ImageView(image);
         imageView.setFitWidth(25);
         imageView.setFitHeight(25);
         imageView.setX(50);
