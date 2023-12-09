@@ -108,16 +108,23 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         return leg2;
     }
 
-    public Pair<TranslateTransition,ParallelTransition> move(double distanceToMove) {
+    public Pair<TranslateTransition,ParallelTransition> move(double distanceToMove,Boolean b) {
         TranslateTransition translate = new TranslateTransition();
 
 //        System.out.println("hero x is " + hero.getX());
 
         //shifting the X coordinate of the centre of the circle by 400
-        translate.setByX(distanceToMove + 18);
+        if (b==false)
+        {
+            translate.setToX(distanceToMove );
+        }
+        else {
+            translate.setByX(distanceToMove+18);
+        }
+
 
         //setting the duration for the Translate transition
-        translate.setDuration(Duration.millis(1000));
+        translate.setDuration(Duration.millis(distanceToMove*10));
 
         //setting cycle count for the Translate transition
         translate.setCycleCount(1);

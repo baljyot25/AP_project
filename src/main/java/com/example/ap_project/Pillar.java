@@ -7,12 +7,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import java.util.ArrayList;
+
 public class Pillar extends PositionDimension implements Collidable,Cloneable {
-    protected Rectangle rectangle;
-    public Pillar(){}
+//    protected Rectangle rectangle;
+    protected ArrayList<Rectangle> rectangles=new ArrayList<>();
+    public Pillar(){
+//        rectangle=new Rectangle();
+    }
     public Pillar(int height,int width, Color color,int xcord,int ycord)
     {
-        rectangle = new Rectangle();
+        rectangles.add(new Rectangle());
+        Rectangle rectangle=rectangles.get(rectangles.size()-1);
         rectangle.setWidth(width);  // Set the width
         rectangle.setHeight(height);  // Set the height
         rectangle.setFill(color);  // Set the fill color
@@ -29,6 +35,8 @@ public class Pillar extends PositionDimension implements Collidable,Cloneable {
 
     public  void set_coordinate(int x , int y)
     {
+        Rectangle rectangle=rectangles.get(rectangles.size()-1);
+
         xcordinate=x;
         ycordinate=y;
         rectangle.setLayoutX(xcordinate);  // X-coordinate
@@ -39,11 +47,26 @@ public class Pillar extends PositionDimension implements Collidable,Cloneable {
     public Pair<TranslateTransition,Rectangle> Transition(int start_position ,int end_position)
 
     {
+        Rectangle rectangle =new Rectangle();
+        rectangle.setWidth(width);  // Set the width
+        rectangle.setHeight(height);  // Set the height
+        rectangle.setFill(color);
+        rectangle.setX(0);
+        rectangle.setY(ycordinate);
+        rectangles.add(rectangle);
+        System.out.println("size of rectangles"+rectangles.size());
+
+//        Rectangle rectangle=rectangles.get(rectangles.size()-1);
+        // Set the fill color
+//        Rectangle rectangle=rectangles.get(rectangles.size()-1);
+
 //        System.out.println(this.rectangle.getX());
-        this.set_coordinate(start_position,ycordinate);
+//        this.set_coordinate(start_position,ycordinate);
         TranslateTransition transition = new TranslateTransition(Duration.millis(600), rectangle);
 
-        transition.setByX(-xcordinate+end_position);
+        transition.setFromX(314);
+        transition.setToX(end_position);
+//        transition.setToX(end_position);
         return new Pair<>(transition,rectangle);
     }
     public void add_to_screen(Pane pane, int start_position,int end_position,Hero hero) {
@@ -54,6 +77,7 @@ public class Pillar extends PositionDimension implements Collidable,Cloneable {
 //        ycordinate=484;
 //        rectangle.setLayoutX(xcordinate);  // X-coordinate
 //        rectangle.setLayoutY(ycordinate);
+        Rectangle rectangle=rectangles.get(rectangles.size()-1);
         this.set_coordinate(start_position,ycordinate);
         TranslateTransition transition = new TranslateTransition(Duration.millis(600), rectangle);
 

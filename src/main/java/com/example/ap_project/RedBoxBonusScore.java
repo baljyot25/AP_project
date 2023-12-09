@@ -11,9 +11,9 @@ public class RedBoxBonusScore extends Pillar{
         super();
         this.height=1;//some constant
         this.width=1;
-        rectangle=new Rectangle();
-        rectangle.setHeight(height);
-        rectangle.setWidth(width);
+//        rectangle=new Rectangle();
+//        rectangle.setHeight(height);
+//        rectangle.setWidth(width);
         //position will be calculated in the add_to_screen.
     }
 

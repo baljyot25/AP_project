@@ -4,7 +4,24 @@ import javafx.scene.control.Label;
 
 public class Score {
     private static int best_score;
-    private int current_score;
+
+    public static int getBest_score() {
+        return best_score;
+    }
+
+    public static void setBest_score(int best_score) {
+        Score.best_score = best_score;
+    }
+
+    public static void setCurrent_score(int current_score) {
+        Score.current_score = current_score;
+    }
+
+    public static int getCurrent_score() {
+        return current_score;
+    }
+
+    private static int current_score=0;
 
     public int getScore() {
         return this.current_score;
