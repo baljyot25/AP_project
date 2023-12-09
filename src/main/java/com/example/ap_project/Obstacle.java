@@ -42,4 +42,18 @@ public class Obstacle implements Collidable {
         this.crashed = true;
         this.imageView.setVisible(false);
     }
+
+    public void resetCrashed() {
+        this.crashed = false;
+    }
+
+    public ImageView getNewImageView() {
+        Image image=new Image(getClass().getResourceAsStream("images/obstacle_javafx.png"));
+        ImageView imageView= new ImageView(image);
+        imageView.setFitWidth(25);
+        imageView.setFitHeight(25);
+        imageView.setX(50);
+
+        return imageView;
+    }
 }

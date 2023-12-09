@@ -78,7 +78,7 @@ public class GameSceneController implements MousePress {
     }
 
 
-    ImageView cherryimageView;
+    ImageView cherryimageView, obstacleimageView;
     public static int getPrevpillar() {
         return prevpillar;
     }
@@ -316,12 +316,12 @@ public class GameSceneController implements MousePress {
             handleCherryCollision();
             System.out.println("cherry claimed val is " + cherry.isClaimed());
         }
-        if (hero.getGroup().getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()) && !obstacle.didCrash()) {
+        if (hero.getGroup().getBoundsInParent().intersects(obstacleimageView.getBoundsInParent()) && !obstacle.didCrash() && pillarTranslationOver) {
             heroTransition.pause();
             System.out.println("Collision Detected!");
             System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()));
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
-//            handleObstacleCollision();
+            handleObstacleCollision();
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
         }
         if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent()) && !collidedWithPillar && heroInverted) {
@@ -368,8 +368,7 @@ public class GameSceneController implements MousePress {
         cherryimageView = cherry.getImageView();
 
         obstacle = new Obstacle();
-
-
+        obstacleimageView = obstacle.getImageView();
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
         Pair<TranslateTransition, Group> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
@@ -419,13 +418,17 @@ public class GameSceneController implements MousePress {
         int min2 = (int) r1.getWidth() + 10;
         int max2 = secondpos - 25;
         int cherryPosition = 0;
+        int obstaclePosition = 0;
 
         if (secondpos - r1.getWidth() >= 35) {
             System.out.println("Distance bw pillars > 35");
             cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
+            obstaclePosition = rVar.nextInt((max2 - min2) ) + min2;
             pane.getChildren().add(cherry.getImageView());
             cherryimageView=cherry.getImageView();
+            obstacleimageView=obstacle.getImageView();
             cherry.getImageView().setX(cherryPosition);
+            obstacle.getImageView().setX(obstaclePosition);
             pane.getChildren().add(obstacle.getImageView());
         } else {
             System.out.println("DISTANCE LESS THAN 35!");
@@ -439,8 +442,6 @@ public class GameSceneController implements MousePress {
         // 450 is safe
 //        cherry.getImageView().setY(450);
         cherry.getImageView().setY(500);
-        obstacle.getImageView().setX(170);
-        obstacle.getImageView().setY(700);
 
         pane.getChildren().add(pillarpair.second());
 
@@ -525,6 +526,15 @@ public class GameSceneController implements MousePress {
 
     private ArrayList<Stick> sticks=new ArrayList<>();
 
+    private boolean pillarTranslationOver = true;
+    public void setPillarTransition(boolean b) {
+        this.pillarTranslationOver = b;
+    }
+
+    public boolean isPillarTranslating() {
+        return this.pillarTranslationOver;
+    }
+
     private void pillarTransition()
     {
         System.out.println("pillar transition");
@@ -532,6 +542,7 @@ public class GameSceneController implements MousePress {
         System.out.println(r1);
         pane.getChildren().remove(r1);
         TranslateTransition transition = new TranslateTransition(Duration.millis(600), r2);
+        transition.setOnFinished(e -> setPillarTransition(true));
         System.out.println(r2.getX());
         System.out.println(r2.getLayoutX());
         System.out.println(r2.localToScreen(0, 0).getX());
@@ -573,6 +584,7 @@ public class GameSceneController implements MousePress {
 
         pane.getChildren().add(pillarpair2.second());
 
+        setPillarTransition(false);
         transition.play();
         imageTransition.play();
         rodtransition.play();
@@ -602,21 +614,34 @@ public class GameSceneController implements MousePress {
         pane.getChildren().remove(cherryimageView);
         cherryimageView=cherry1.getNewImageView();
 
+        obstacle.resetCrashed();
+        Obstacle obstacle1=new Obstacle();
+        pane.getChildren().remove(obstacleimageView);
+        obstacleimageView = obstacle1.getNewImageView();
+
         Random rVar = new Random();
 
 
         int min2 = (int) r1.getWidth() + 10;
         int max2 = secondpos - 25;
         int cherryPosition = 0;
+        int obstaclePosition = 0;
+
 
         ImageView newIV = new ImageView();
-        if (secondpos - r1.getWidth() >= 35) {
+        double pillarDist = secondpos - r1.getWidth();
+        if (pillarDist >= 35) {
             System.out.println("Distance bw pillars > 35");
             cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
-
             pane.getChildren().add(cherryimageView);
             cherryimageView.setX(cherryPosition);
-//            pane.getChildren().add(obstacle.getImageView());
+
+            if (pillarDist >= 50) {
+                System.out.println("Distance greater than 50");
+                obstaclePosition = rVar.nextInt(((max2 - 5) - (min2 + 5) ) + min2);
+                pane.getChildren().add(obstacleimageView);
+                obstacleimageView.setX(obstaclePosition);
+            }
         } else {
             System.out.println("DISTANCE LESS THAN 35!");
         }
@@ -624,11 +649,17 @@ public class GameSceneController implements MousePress {
         System.out.println("MAX2 " + max2 + " MIN2 " + min2);
 
         System.out.println("Cherry position is " + cherryPosition);
+        System.out.println("Obstacle position is " + obstaclePosition);
 
 
         // 450 is safe
 //        cherry.getImageView().setY(450);
         cherryimageView.setY(500);
+        obstacleimageView.setY(450);
+
+        // 450 is safe
+//        obstacle.getImageView().setY(450);
+
 
 
     }
