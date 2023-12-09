@@ -31,8 +31,9 @@ public class GameSceneController implements MousePress {
 
     @FXML
     private Label score_label;
+    private Sound stickSound, cherrySound, bgMusic, dropSound;
 
-    private Score score;
+    private Score score = new Score();
     private Cherry cherry;
     private Stick stick;
 
@@ -55,6 +56,19 @@ public class GameSceneController implements MousePress {
 
     public static void setPrevpillar(int prevpillar) {
         GameSceneController.prevpillar = prevpillar;
+    }
+
+    private void updateScoreLabel() {
+        Integer curScore = this.score.getScore();
+        this.score_label.setText(curScore.toString());
+    }
+
+    public void initializeSounds() {
+        bgMusic = new Sound("bgMusic.mp3");
+        cherrySound = new Sound("cherrySound.mp3", 1);
+        stickSound = new Sound("increaseStick.mp3");
+        dropSound = new Sound("perfectDrop.mp3", 1);
+
     }
 
     public static int getPrevpillar() {
@@ -104,6 +118,7 @@ public class GameSceneController implements MousePress {
         }
         public void stickFall()
         {
+            stickSound.toggleMusic();
             Rotate rotation = new Rotate();
             rotation.pivotXProperty().bind(rod.startXProperty());
             rotation.pivotYProperty().bind(rod.startYProperty());
@@ -137,25 +152,38 @@ public class GameSceneController implements MousePress {
         }
     };
 
+    public void handleCherryCollision() {
+        cherry.onCollision();
+        cherrySound.playMusic();
+        System.out.println("Score is : " + score);
+        score.increment_current_score();
+        updateScoreLabel();
+        System.out.println("Score is : " + score);
+    }
+
     public void checkCollision() {
-        if (hero.imageView.getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent())) {
+        if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()) && !cherry.isClaimed()) {
             System.out.println("Collision Detected!");
+            System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()));
+            System.out.println("cherry claimed val is " + cherry.isClaimed());
+            handleCherryCollision();
+            System.out.println("cherry claimed val is " + cherry.isClaimed());
         }
     }
 
     @FXML
     private void initialize() {
 
-
-
         //every pillar has a default cordinates at the bottom of the screen , whcih will be changes in future
-
+        this.initializeSounds();
+        bgMusic.playMusic();
         pillars.add(new Pillar(184,87,Color.BLACK,114,484));
         pillars.add(new Pillar(184,30,Color.BLACK,SCREENWIDTH,484));
         pillars.add(new Pillar(184,50,Color.BLACK,SCREENWIDTH,484));
         pillars.add(new Pillar(184,70,Color.BLACK,SCREENWIDTH,484));
         System.out.println(pillars);
         hero=new Hero();
+
         cherry = new Cherry();
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
@@ -180,6 +208,8 @@ public class GameSceneController implements MousePress {
 
         pane.getChildren().add(pillarpair2.second());
         pane.getChildren().add(heropair.second());
+
+        // add only if pillar distance greater than set parameter
 
         pane.getChildren().add(cherry.getImageView());
         cherry.getImageView().setX(150);
@@ -206,8 +236,6 @@ public class GameSceneController implements MousePress {
         pane.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleMouseReleased);
         pane.addEventFilter(MouseEvent.MOUSE_CLICKED,this :: handleMouseClick);
 
-
-        collisionTimer.start();
 
 
     }
@@ -241,11 +269,15 @@ public class GameSceneController implements MousePress {
             System.out.println("Mouse Released!");
             stick.stickFall();
             increaseTimeline.pause();
-
+            stickSound.stop();
         }
 
     }
     private void makeHeroMove() {
+
+        collisionTimer.start();
+        dropSound.playMusic();
+        // r1localscreengetx + r1getwidth ----> r2localscreengetx
         double rec1X= r1.localToScreen(0, 0).getX();
         double rec1Y = r1.localToScreen(0, 0).getY();
         double rec2X = r2.localToScreen(0, 0).getX();
@@ -262,6 +294,7 @@ public class GameSceneController implements MousePress {
         System.out.println("Rectangle position on screen: X=" + (rec2X+r2.getWidth()) + ", Y=" + rec2Y);
         System.out.println(stick.stickLength);
         TranslateTransition deathTransition=hero.onDeath();
+
 
         if (rec1X+rec1width+stick.stickLength+1.9>=rec2X  && rec1X+rec1width+stick.stickLength+1.9<=rec2X+rec2width)
         {
@@ -356,7 +389,9 @@ public class GameSceneController implements MousePress {
 //        System.out.println("Mouse pressed val is " + mousePressed);
 //        System.out.println("Mouse Pressed at X: " + event.getX() + ", Y: " + event.getY());
         if (mousePressed == 1) {
+            System.out.println("Setting sound play on!");
             stick.setVisible(true);
+            stickSound.toggleMusic();
             increaseTimeline.play();
         } else if (mousePressed > 1){
 

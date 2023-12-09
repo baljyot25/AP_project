@@ -24,10 +24,15 @@ public class Cherry implements Collidable {
         this.imageView= new ImageView(image);
         this.imageView.setFitWidth(25);
         this.imageView.setFitHeight(25);
+        setRandomPosition();
+    }
+
+    public boolean isClaimed() {
+        return this.claimed;
     }
 
     public void setRandomPosition() {
-//        this.imageView.setX
+        this.imageView.setX(50);
     }
 
     public boolean revive_possible()
@@ -50,6 +55,7 @@ public class Cherry implements Collidable {
 
     @Override
     public void onCollision() {
-
+        this.claimed = true;
+        this.imageView.setVisible(false);
     }
 }
