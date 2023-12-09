@@ -2,6 +2,7 @@ package com.example.ap_project;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,9 @@ public class Sound {
     }
 
     public void playMusic() {
+        if (this.mediaPlayer.getCycleCount() == 1) {
+            mediaPlayer.seek(Duration.ZERO);
+        }
         mediaPlayer.play();
     }
 

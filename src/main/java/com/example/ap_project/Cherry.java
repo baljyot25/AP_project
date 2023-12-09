@@ -7,15 +7,24 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Cherry implements Collidable {
-    private static int cherries;//will never be reset to zero
+    private static int cherries = 0;//will never be reset to zero
     private boolean claimed;
     private Image image;
     private ImageView imageView;
 
-    private int cherriesToRevive=10;
+    private int cherriesToRevive=1;
 
     public ImageView getImageView() {
         return this.imageView;
+    }
+
+    public ImageView getNewImageView() {
+        ImageView newIV = new ImageView(image);
+        return newIV;
+    }
+
+    public Image getImage() {
+        return this.image;
     }
 
 
@@ -30,6 +39,10 @@ public class Cherry implements Collidable {
 
     public boolean isClaimed() {
         return this.claimed;
+    }
+
+    public void reset() {
+        this.claimed = false;
     }
 
     public void setRandomPosition() {
@@ -64,6 +77,10 @@ public class Cherry implements Collidable {
 
     public static void setCherries(int cherries) {
         Cherry.cherries = cherries;
+    }
+
+    public static void incrementCherries() {
+        ++Cherry.cherries;
     }
 
     @Override

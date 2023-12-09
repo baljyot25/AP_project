@@ -58,6 +58,10 @@ public class GameSceneController implements MousePress {
     private Hero hero;
 
     private ArrayList<Pillar> pillars=new ArrayList<>();
+
+    @FXML
+    private Label cherryScore;
+
     public void initializeSounds() {
         cherrySound = Sound.getInstance("cherrySound.mp3");
         cherrySound.setCycleTo(1);
@@ -265,10 +269,10 @@ public class GameSceneController implements MousePress {
     public void handleCherryCollision() {
         cherry.onCollision();
         cherrySound.playMusic();
-        System.out.println("Score is : " + score);
-//        score.increment_current_score();
-       //   to update cherry score
-        System.out.println("Score is : " + score);
+        System.out.println("Score is : " + Cherry.getCherries());
+        Cherry.incrementCherries();
+        cherryScore.setText(String.valueOf(Cherry.getCherries()));
+        System.out.println("Score is : " + Cherry.getCherries());
     }
 
     public void handleObstacleCollision() {
@@ -278,7 +282,7 @@ public class GameSceneController implements MousePress {
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) hero.getImageView().getScene().getWindow());
         });
         deathTransition.play();
         hero.playDeathSound();
@@ -309,7 +313,7 @@ public class GameSceneController implements MousePress {
             System.out.println("Collision Detected!");
             System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()));
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
-            handleObstacleCollision();
+//            handleObstacleCollision();
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
         }
         if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent()) && !collidedWithPillar && heroInverted) {
@@ -328,6 +332,7 @@ public class GameSceneController implements MousePress {
     double firstwidth;
     @FXML
     private void initialize() {
+        cherryScore.setText(String.valueOf(Cherry.getCherries()));
         this.collidedWithPillar = false;
         pause_button.setOnMouseClicked(event -> {
             System.out.println("Image clicked");
@@ -391,20 +396,41 @@ public class GameSceneController implements MousePress {
         pane.getChildren().add(pillarpair2.second());
         pane.getChildren().add(heropair.second());
 
-        pane.getChildren().add(cherry.getImageView());
-        pane.getChildren().add(obstacle.getImageView());
-        cherry.getImageView().setX(150);
-        cherry.getImageView().setY(450);
-        obstacle.getImageView().setX(170);
-        obstacle.getImageView().setY(700);
-
-        pane.getChildren().add(pillarpair.second());
 
         heropair.first().play();
         pillarpair.first().play();
         pillarpair2.first().play();
         r1=pillarpair.second();
         r2=pillarpair2.second();
+
+        Random rVar = new Random();
+
+        int min2 = (int) r1.getWidth() + 10;
+        int max2 = secondpos - 25;
+        int cherryPosition = 0;
+
+        if (secondpos - r1.getWidth() >= 35) {
+            System.out.println("Distance bw pillars > 35");
+            cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
+            pane.getChildren().add(cherry.getImageView());
+            cherry.getImageView().setX(cherryPosition);
+            pane.getChildren().add(obstacle.getImageView());
+        } else {
+            System.out.println("DISTANCE LESS THAN 35!");
+        }
+
+        System.out.println("MAX2 " + max2 + " MIN2 " + min2);
+
+        System.out.println("Cherry position is " + cherryPosition);
+
+
+        // 450 is safe
+//        cherry.getImageView().setY(450);
+        cherry.getImageView().setY(500);
+        obstacle.getImageView().setX(170);
+        obstacle.getImageView().setY(700);
+
+        pane.getChildren().add(pillarpair.second());
 
         curStickX = pillarpair.second().getWidth();
         curStickY = SCREENHEIGHT - pillarpair.second().getHeight();
@@ -545,6 +571,38 @@ public class GameSceneController implements MousePress {
         stick=new Stick(curStickX,curStickY);
 //        sticks.add(stick);
 
+        Random rVar = new Random();
+        Image oldImage = cherry.getImage();
+        ImageView newImageView= new ImageView(oldImage);
+        ImageView oldImageView = cherry.getImageView();
+        System.out.println("Remove children " + pane.getChildren().remove(oldImageView));
+        cherry = new Cherry();
+        int min2 = (int) r1.getWidth() + 10;
+        int max2 = secondpos - 25;
+        int cherryPosition = 0;
+
+        ImageView newIV = new ImageView();
+        if (secondpos - r1.getWidth() >= 35) {
+            System.out.println("Distance bw pillars > 35");
+            cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
+            newIV = cherry.getNewImageView();
+            pane.getChildren().add(newIV);
+            newIV.setX(cherryPosition);
+            pane.getChildren().add(obstacle.getImageView());
+        } else {
+            System.out.println("DISTANCE LESS THAN 35!");
+        }
+
+        System.out.println("MAX2 " + max2 + " MIN2 " + min2);
+
+        System.out.println("Cherry position is " + cherryPosition);
+
+
+        // 450 is safe
+//        cherry.getImageView().setY(450);
+        newIV.setY(500);
+
+
     }
 
     public ArrayList<Double> getPillarDetails() {
@@ -604,7 +662,7 @@ public class GameSceneController implements MousePress {
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) hero.getImageView().getScene().getWindow());
         });
 
         if (rec1X+rec1width+stick.stickLength+1.9>=rec2X  && rec1X+rec1width+stick.stickLength+1.9<=rec2X+rec2width)
@@ -703,19 +761,19 @@ public class GameSceneController implements MousePress {
             Double heroX = hero.getImageView().localToScreen(0, 0).getX();
             Double groupX = hero.getGroup().localToScreen(0, 0).getX();
 
-            System.out.println("INVERT DETAILS");
-            System.out.println("hero x is " + heroX);
-            System.out.println("hero group x is " + groupX);
-            System.out.println("Pillar details are " + pillarDetails);
-            heroX = heroX + heroOffset;
-
-            if (heroX > pillarDetails.get(0) && heroX < pillarDetails.get(1)) {
-                System.out.println("Hero is on pillar1 so won't rotate");
-                return;
-            } else if (heroX > pillarDetails.get(2) && heroX < pillarDetails.get(3)){
-                System.out.println("Hero is on pillar2 so won't rotate");
-                return;
-            }
+//            System.out.println("INVERT DETAILS");
+//            System.out.println("hero x is " + heroX);
+//            System.out.println("hero group x is " + groupX);
+//            System.out.println("Pillar details are " + pillarDetails);
+//            heroX = heroX + heroOffset;
+//
+//            if (heroX > pillarDetails.get(0) && heroX < pillarDetails.get(1)) {
+//                System.out.println("Hero is on pillar1 so won't rotate");
+//                return;
+//            } else if (heroX > pillarDetails.get(2) && heroX < pillarDetails.get(3)){
+//                System.out.println("Hero is on pillar2 so won't rotate");
+//                return;
+//            }
 
             group.setRotate(group.getRotate() + 180);
             heroInverted = !heroInverted;
