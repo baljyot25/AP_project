@@ -108,6 +108,10 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         return leg2;
     }
 
+//    public double getGroupX() {
+////        this.group.get
+//    }
+
     public Pair<TranslateTransition,ParallelTransition> move(double distanceToMove,Boolean b) {
         TranslateTransition translate = new TranslateTransition();
 
@@ -179,6 +183,7 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
         return translateTransition;
 
     }
+
     private void deathSound()
     {
 

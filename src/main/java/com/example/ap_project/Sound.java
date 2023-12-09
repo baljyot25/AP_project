@@ -7,6 +7,7 @@ import java.util.Objects;
 
 
 public class Sound {
+    // Sound type ki ArrayList bgSound, onDeath sound array
     private Media media;
     private MediaPlayer mediaPlayer;
 

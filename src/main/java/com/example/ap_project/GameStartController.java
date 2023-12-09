@@ -23,14 +23,14 @@ public class GameStartController {
 
     @FXML
     private void initialize() {
-        String soundPath = "audio/sample_audio.mp3";
-
-        // Load sound using getResourceAsStream
-        Media sound = new Media(getClass().getResource(soundPath).toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(sound);
-
-        Button playButton = new Button("Play Sound");
-        mediaPlayer.play();
+//        String soundPath = "audio/sample_audio.mp3";
+//
+//        // Load sound using getResourceAsStream
+//        Media sound = new Media(getClass().getResource(soundPath).toString());
+//        MediaPlayer mediaPlayer = new MediaPlayer(sound);
+//
+//        Button playButton = new Button("Play Sound");
+//        mediaPlayer.play();
 
     }
     @FXML

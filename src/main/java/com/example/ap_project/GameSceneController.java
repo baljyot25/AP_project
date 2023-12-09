@@ -18,6 +18,7 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
@@ -35,6 +36,7 @@ public class GameSceneController implements MousePress {
     private Sound stickSound, cherrySound, bgMusic, dropSound;
     private Score score;
     private Cherry cherry;
+    private Obstacle obstacle;
     private Stick stick;
 
     private static final int SCREENHEIGHT=668;
@@ -49,6 +51,7 @@ public class GameSceneController implements MousePress {
     private boolean heroInverted = false;
     private boolean heroReachedPillar = false;
 
+    private boolean collidedWithPillar = false;
     private static int prevpillar=0;
     private Hero hero;
 
@@ -61,9 +64,9 @@ public class GameSceneController implements MousePress {
     }
 
 
-    public static void setPrevpillar ( int prevpillar)
-    {GameSceneController.prevpillar = prevpillar;
-        }
+    public static void setPrevpillar (int prevpillar) {
+        GameSceneController.prevpillar = prevpillar;
+    }
 
 
 
@@ -110,7 +113,7 @@ public class GameSceneController implements MousePress {
 
         public void extendStick()
         {
-            System.out.println("Increase stick length called!");
+//            System.out.println("Increase stick length called!");
             stickLength += INCREASE_AMOUNT;
 //        stick.setEndY(stickLength);
             // curStic
@@ -169,6 +172,29 @@ public class GameSceneController implements MousePress {
        //   to update cherry score
         System.out.println("Score is : " + score);
     }
+
+    public void handleObstacleCollision() {
+        obstacle.onCollision();
+//        obstacleSound.playMusic();
+        TranslateTransition deathTransition=hero.onDeath();
+        deathTransition.setOnFinished(Event->
+        {
+            SceneLoader s=SceneLoader.getInstance();
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+        });
+        deathTransition.play();
+    }
+
+    public void handlePillarCollision() {
+        TranslateTransition deathTransition=hero.onDeath();
+        deathTransition.setOnFinished(Event->
+        {
+            SceneLoader s=SceneLoader.getInstance();
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+        });
+        deathTransition.play();
+    }
+
     public void checkCollision() {
         if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()) && !cherry.isClaimed()) {
             System.out.println("Collision Detected!");
@@ -176,8 +202,19 @@ public class GameSceneController implements MousePress {
             System.out.println("cherry claimed val is " + cherry.isClaimed());
             handleCherryCollision();
             System.out.println("cherry claimed val is " + cherry.isClaimed());
+        }
+        if (hero.getGroup().getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()) && !obstacle.didCrash()) {
+            System.out.println("Collision Detected!");
+            System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(obstacle.getImageView().getBoundsInParent()));
+            System.out.println("obstacle claimed val is " + obstacle.didCrash());
+            handleObstacleCollision();
+            System.out.println("obstacle claimed val is " + obstacle.didCrash());
+        }
+        if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent())) {
+            System.out.println("Pillar Collision Detected!");
+            handlePillarCollision();
+        }
     }
-}
 
 
 
@@ -187,7 +224,7 @@ public class GameSceneController implements MousePress {
     @FXML
     private void initialize() {
         this.initializeSounds();
-        bgMusic.playMusic();
+//        bgMusic.playMusic();
         score_label.setText(String.valueOf(Score.getCurrent_score()));
 
 
@@ -200,6 +237,9 @@ public class GameSceneController implements MousePress {
         System.out.println(pillars);
         hero=new Hero();
         cherry = new Cherry();
+        obstacle = new Obstacle();
+
+
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
         Pair<TranslateTransition, Group> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
@@ -222,7 +262,11 @@ public class GameSceneController implements MousePress {
         int max=SCREENWIDTH-(int)p2.width();
         System.out.println(p2);
         System.out.println(r.nextInt((max - min) ) + min);
-        secondpos=r.nextInt((max - min) ) + min;
+        secondpos=r.nextInt((max - min) ) + min; // second pillar
+
+
+
+
 
         Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(314,secondpos);
         secwidth=pillarpair2.second().getWidth();
@@ -234,8 +278,11 @@ public class GameSceneController implements MousePress {
         pane.getChildren().add(heropair.second());
 
         pane.getChildren().add(cherry.getImageView());
+        pane.getChildren().add(obstacle.getImageView());
         cherry.getImageView().setX(150);
         cherry.getImageView().setY(450);
+        obstacle.getImageView().setX(170);
+        obstacle.getImageView().setY(450);
 
         pane.getChildren().add(pillarpair.second());
 
@@ -259,8 +306,11 @@ public class GameSceneController implements MousePress {
         pane.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleMouseReleased);
         pane.addEventFilter(MouseEvent.MOUSE_CLICKED,this :: handleMouseClick);
 
+//        ArrayList<Double> pillarData = getPillarDetails();
+//        System.out.println("Pillar Data: ");
+//        System.out.println(pillarData);
 
-
+//        printPillarDetails();
 
 
     }
@@ -284,20 +334,28 @@ public class GameSceneController implements MousePress {
 
 
     private void handleMouseClick(MouseEvent event)  {
-        System.out.println("aefewrf");
+        System.out.println("[Event] : Mouse Clicked");
     }
 
 
 
     public void handleMouseReleased(MouseEvent event) {
         if (mousePressed == 1) {
-            System.out.println("Mouse Released!");
+            System.out.println("[Event] : Mouse Released");
             stick.stickFall();
             increaseTimeline.pause();
 
         }
 
     }
+
+    private Double heroOffset = 0.0;
+    private void getHeroOffset() {
+        ArrayList<Double> pillarDetails = getPillarDetails();
+        Double heroX = hero.getImageView().localToScreen(0, 0).getX();
+        heroOffset = heroX - pillarDetails.get(1);
+    }
+
     private ArrayList<Stick> sticks=new ArrayList<>();
 
     private void pillarTransition()
@@ -372,9 +430,43 @@ public class GameSceneController implements MousePress {
 //        stick.setVisible(false);
         stick=new Stick(curStickX,curStickY);
 //        sticks.add(stick);
+
+    }
+
+    public ArrayList<Double> getPillarDetails() {
+        double rec1X= r1.localToScreen(0, 0).getX();
+        double rec1Y = r1.localToScreen(0, 0).getY();
+        double rec2X = r2.localToScreen(0, 0).getX();
+        double rec2Y = r2.localToScreen(0, 0).getY();
+        double rec1width=r1.getWidth();
+        double rec2width=r2.getWidth();
+        double rightTopX = r2.getBoundsInParent().getMaxX();
+
+//        System.out.println(r1.getWidth());
+//        System.out.println("Rectangle R1");
+//        // rec1x can act as offset, so we can subtract that from all rectangles
+//        System.out.println("Rectangle position on screen: X=" + rec1X + ", Y=" + rec1Y);
+//        System.out.println("Rectangle position on screen: X=" + (rec1X+r1.getWidth()) + ", Y=" + rec1Y);
+//
+//        System.out.println("Rectangle R2");
+//        System.out.println("Rectangle position on screen: X=" + rec2X + ", Y=" + rec2Y);
+//        System.out.println("Rectangle position on screen: X=" + (rec2X+r2.getWidth()) + ", Y=" + rec2Y);
+
+        ArrayList<Double> retVal = new ArrayList<>(4);
+//        retVal.add(0.0);
+//        retVal.add(rec1width);
+//        retVal.add(rec2X - rec1X);
+//        retVal.add(rec2width);
+//        return retVal;
+        retVal.add(rec1X);
+        retVal.add(rec1X + rec1width);
+        retVal.add(rec2X);
+        retVal.add(rec2X + rec2width);
+        return retVal;
     }
 
     private void makeHeroMove() {
+        getHeroOffset();
         dropSound.playMusic();
         collisionTimer.start();
         double rec1X= r1.localToScreen(0, 0).getX();
@@ -386,10 +478,11 @@ public class GameSceneController implements MousePress {
         double rightTopX = r2.getBoundsInParent().getMaxX();
 
         System.out.println(r1.getWidth());
+        System.out.println("Rectangle R1");
         System.out.println("Rectangle position on screen: X=" + rec1X + ", Y=" + rec1Y);
         System.out.println("Rectangle position on screen: X=" + (rec1X+r1.getWidth()) + ", Y=" + rec1Y);
 
-
+        System.out.println("Rectangle R2");
         System.out.println("Rectangle position on screen: X=" + rec2X + ", Y=" + rec2Y);
         System.out.println("Rectangle position on screen: X=" + (rec2X+r2.getWidth()) + ", Y=" + rec2Y);
         System.out.println(stick.stickLength);
@@ -406,9 +499,9 @@ public class GameSceneController implements MousePress {
 
 
 
-            System.out.println("Second pas"+secondpos);
-            System.out.println("r2 pos"+r2.getLayoutX());
-            System.out.println("r2 pos"+(r2.localToScreen(0,0).getX()-r1.localToScreen(0,0).getX()));
+            System.out.println("Second pas "+secondpos);
+            System.out.println("r2 pos "+r2.getLayoutX());
+            System.out.println("r2 pos "+(r2.localToScreen(0,0).getX()-r1.localToScreen(0,0).getX()));
             System.out.println("chalega");
 
 
@@ -515,6 +608,24 @@ public class GameSceneController implements MousePress {
 //
             System.out.println("Rotating!");
             Group group =hero.getGroup();
+            ArrayList<Double> pillarDetails = getPillarDetails();
+            Double heroX = hero.getImageView().localToScreen(0, 0).getX();
+            Double groupX = hero.getGroup().localToScreen(0, 0).getX();
+
+            System.out.println("INVERT DETAILS");
+            System.out.println("hero x is " + heroX);
+            System.out.println("hero group x is " + groupX);
+            System.out.println("Pillar details are " + pillarDetails);
+            heroX = heroX + heroOffset;
+
+            if (heroX > pillarDetails.get(0) && heroX < pillarDetails.get(1)) {
+                System.out.println("Hero is on pillar1 so won't rotate");
+                return;
+            } else if (heroX > pillarDetails.get(2) && heroX < pillarDetails.get(3)){
+                System.out.println("Hero is on pillar2 so won't rotate");
+                return;
+            }
+
             group.setRotate(group.getRotate() + 180);
             heroInverted = !heroInverted;
             if (!heroInverted) {
