@@ -31,7 +31,15 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     public ImageView getImageView() {
         return imageView;
     }
+    private boolean heroInMotion = false;
 
+    public boolean isHeroInMotion() {
+        return this.heroInMotion;
+    }
+
+    public void setHeroInMotion(boolean b){
+        this.heroInMotion = b;
+    }
 
     public Hero(){
 
@@ -178,7 +186,6 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
     }
 
     public TranslateTransition onDeath() {
-
         TranslateTransition translateTransition=new TranslateTransition(Duration.seconds(2), group);
         translateTransition.setByY(454);
         return translateTransition;

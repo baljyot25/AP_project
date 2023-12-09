@@ -51,6 +51,10 @@ public class Sound {
         }
     }
 
+    public boolean isPlaying() {
+        return this.mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING;
+    }
+
     public void playMusic() {
         if (this.mediaPlayer.getCycleCount() == 1) {
             mediaPlayer.seek(Duration.ZERO);

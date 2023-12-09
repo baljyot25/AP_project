@@ -1,4 +1,3 @@
-
 package com.example.ap_project;
 
 
@@ -7,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Cherry implements Collidable {
+    private static boolean revived = false;
     private static int cherries = 0;//will never be reset to zero
     private boolean claimed;
     private Image image;
@@ -14,13 +14,29 @@ public class Cherry implements Collidable {
 
     private int cherriesToRevive=1;
 
+    public static void setRevived() {
+        revived = true;
+    }
+    public static void resetRevived() {
+        revived = false;
+    }
+    public static boolean getRevived() {
+        return revived;
+    }
+
     public ImageView getImageView() {
         return this.imageView;
     }
 
+
     public ImageView getNewImageView() {
-        ImageView newIV = new ImageView(image);
-        return newIV;
+        Image image=new Image(getClass().getResourceAsStream("images/cherry_javafx.png"));
+        ImageView imageView= new ImageView(image);
+        imageView.setFitWidth(25);
+        imageView.setFitHeight(25);
+        imageView.setX(50);
+
+        return imageView;
     }
 
     public Image getImage() {
@@ -87,5 +103,9 @@ public class Cherry implements Collidable {
     public void onCollision() {
         this.claimed = true;
         this.imageView.setVisible(false);
+    }
+
+    public void resetClaimed() {
+        this.claimed = false;
     }
 }

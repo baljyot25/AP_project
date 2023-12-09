@@ -63,5 +63,11 @@
             <Font size="26.0" />
          </font>
       </Label>
+      <Rectangle fx:id="already_revived_rect" arcHeight="5.0" arcWidth="5.0" fill="#0872fc" height="47.0" layoutX="19.0" layoutY="606.0" opacity="0.81" stroke="#696565" strokeType="INSIDE" width="271.0" />
+      <Label fx:id="already_revived" layoutX="32.0" layoutY="606.0" onMouseClicked="#revive" prefHeight="47.0" prefWidth="256.0" text="    Already Revived" textFill="#fffafa">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

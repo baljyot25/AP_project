@@ -32,6 +32,8 @@ public class GameSceneController implements MousePress {
     private Pane pane;
     private MediaPlayer mediaPlayer;
     private Map<String,Sound> sounds;
+    private boolean gamePaused = false;
+    private boolean gameJustResumed = false;
 
     @FXML
     private Label score_label;
@@ -76,7 +78,7 @@ public class GameSceneController implements MousePress {
     }
 
 
-
+    ImageView cherryimageView;
     public static int getPrevpillar() {
         return prevpillar;
     }
@@ -87,11 +89,11 @@ public class GameSceneController implements MousePress {
     private ImageView pause_button;
 
     public void pausegame() {
-        if (heroTransition==null)
+        System.out.println("Pause game called");
+        if (heroTransition!=null)
         {
-            return;
+            heroTransition.pause();
         }
-        heroTransition.pause();
 
         Rectangle re=new Rectangle(0,0,314,SCREENHEIGHT);
         Rectangle score=new Rectangle(240,183,Color.WHITE);score.setLayoutY(164);score.setLayoutX(36);
@@ -145,11 +147,14 @@ public class GameSceneController implements MousePress {
         playImageView.setOnMouseClicked(event -> {
             // Handle play image click
             System.out.println("Play image clicked");
-
             // Remove nodes related to the Play image
             pane.getChildren().removeAll(re, score, currentScoreLabel, bestLabel, currentScoreValueLabel, bestValueLabel,
                     homeImageView, restartImageView, playImageView);
-            heroTransition.play();
+            if (heroTransition != null) {
+                heroTransition.play();
+            }
+            gamePaused = false;
+            gameJustResumed = true;
         });
 
         pane.getChildren().add(re);
@@ -215,7 +220,7 @@ public class GameSceneController implements MousePress {
 
         public void extendStick()
         {
-//            System.out.println("Increase stick length called!");
+            System.out.println("Increase stick length called!");
             stickLength += INCREASE_AMOUNT;
 //        stick.setEndY(stickLength);
             // curStic
@@ -224,7 +229,9 @@ public class GameSceneController implements MousePress {
         }
         public void stickFall()
         {
-            stickSound.toggleMusic();
+            if (hero.isHeroInMotion()) {
+                return;
+            }
             Rotate rotation = new Rotate();
             rotation.pivotXProperty().bind(rod.startXProperty());
             rotation.pivotYProperty().bind(rod.startYProperty());
@@ -268,6 +275,7 @@ public class GameSceneController implements MousePress {
 
     public void handleCherryCollision() {
         cherry.onCollision();
+        cherryimageView.setVisible(false);
         cherrySound.playMusic();
         System.out.println("Score is : " + Cherry.getCherries());
         Cherry.incrementCherries();
@@ -282,10 +290,10 @@ public class GameSceneController implements MousePress {
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) hero.getImageView().getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) pane.getScene().getWindow());
         });
-        deathTransition.play();
         hero.playDeathSound();
+        deathTransition.play();
     }
 
     public void handlePillarCollision() {
@@ -294,14 +302,14 @@ public class GameSceneController implements MousePress {
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) r2.getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) pane.getScene().getWindow());
         });
-        deathTransition.play();
         hero.playDeathSound();
+        deathTransition.play();
     }
 
     public void checkCollision() {
-        if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()) && !cherry.isClaimed()) {
+        if (hero.getGroup().getBoundsInParent().intersects(cherryimageView.getBoundsInParent()) && !cherry.isClaimed()) {
             System.out.println("Collision Detected!");
             System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()));
             System.out.println("cherry claimed val is " + cherry.isClaimed());
@@ -330,8 +338,10 @@ public class GameSceneController implements MousePress {
     int secondpos;
     double secwidth;
     double firstwidth;
+
     @FXML
     private void initialize() {
+        System.out.println("INIITALIZE CALLED!\n");
         cherryScore.setText(String.valueOf(Cherry.getCherries()));
         this.collidedWithPillar = false;
         pause_button.setOnMouseClicked(event -> {
@@ -340,7 +350,6 @@ public class GameSceneController implements MousePress {
             System.out.println("bruhhhhh");;
             event.consume();
             // Call the specific function to handle the image click
-            pausegame();
         });
         this.initializeSounds();
 //        bgMusic.playMusic();
@@ -356,6 +365,8 @@ public class GameSceneController implements MousePress {
         System.out.println(pillars);
         hero=new Hero();
         cherry = new Cherry();
+        cherryimageView = cherry.getImageView();
+
         obstacle = new Obstacle();
 
 
@@ -413,6 +424,7 @@ public class GameSceneController implements MousePress {
             System.out.println("Distance bw pillars > 35");
             cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
             pane.getChildren().add(cherry.getImageView());
+            cherryimageView=cherry.getImageView();
             cherry.getImageView().setX(cherryPosition);
             pane.getChildren().add(obstacle.getImageView());
         } else {
@@ -475,17 +487,32 @@ public class GameSceneController implements MousePress {
 
     private void handleMouseClick(MouseEvent event)  {
         System.out.println("[Event] : Mouse Clicked");
+        if (event.getX() <= 35 && event.getY() <= 35) {
+            return;
+        }
     }
 
 
 
     public void handleMouseReleased(MouseEvent event) {
+        if (gamePaused) {
+            return;
+        }
+
+
+        if (gameJustResumed) {
+            System.out.println("Mouse released and game just resumed toggled");
+            gameJustResumed = false;
+            return;
+        }
+
         if (mousePressed == 1) {
             System.out.println("[Event] : Mouse Released");
             stick.stickFall();
             increaseTimeline.pause();
 
         }
+
 
     }
 
@@ -570,13 +597,14 @@ public class GameSceneController implements MousePress {
 //        stick.setVisible(false);
         stick=new Stick(curStickX,curStickY);
 //        sticks.add(stick);
+        cherry.resetClaimed();
+        Cherry cherry1=new Cherry();
+        pane.getChildren().remove(cherryimageView);
+        cherryimageView=cherry1.getNewImageView();
 
         Random rVar = new Random();
-        Image oldImage = cherry.getImage();
-        ImageView newImageView= new ImageView(oldImage);
-        ImageView oldImageView = cherry.getImageView();
-        System.out.println("Remove children " + pane.getChildren().remove(oldImageView));
-        cherry = new Cherry();
+
+
         int min2 = (int) r1.getWidth() + 10;
         int max2 = secondpos - 25;
         int cherryPosition = 0;
@@ -585,10 +613,10 @@ public class GameSceneController implements MousePress {
         if (secondpos - r1.getWidth() >= 35) {
             System.out.println("Distance bw pillars > 35");
             cherryPosition = rVar.nextInt((max2 - min2) ) + min2;
-            newIV = cherry.getNewImageView();
-            pane.getChildren().add(newIV);
-            newIV.setX(cherryPosition);
-            pane.getChildren().add(obstacle.getImageView());
+
+            pane.getChildren().add(cherryimageView);
+            cherryimageView.setX(cherryPosition);
+//            pane.getChildren().add(obstacle.getImageView());
         } else {
             System.out.println("DISTANCE LESS THAN 35!");
         }
@@ -600,7 +628,7 @@ public class GameSceneController implements MousePress {
 
         // 450 is safe
 //        cherry.getImageView().setY(450);
-        newIV.setY(500);
+        cherryimageView.setY(500);
 
 
     }
@@ -638,6 +666,8 @@ public class GameSceneController implements MousePress {
     }
 
     private void makeHeroMove() {
+        hero.setHeroInMotion(true);
+        stickSound.stop();
         getHeroOffset();
         dropSound.playMusic();
         collisionTimer.start();
@@ -662,7 +692,7 @@ public class GameSceneController implements MousePress {
         deathTransition.setOnFinished(Event->
         {
             SceneLoader s=SceneLoader.getInstance();
-            s.loadscene(pane,"game_end_scene.fxml", (Stage) hero.getImageView().getScene().getWindow());
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) pane.getScene().getWindow());
         });
 
         if (rec1X+rec1width+stick.stickLength+1.9>=rec2X  && rec1X+rec1width+stick.stickLength+1.9<=rec2X+rec2width)
@@ -679,13 +709,13 @@ public class GameSceneController implements MousePress {
 
             Pair<TranslateTransition,ParallelTransition>p=hero.move(rightTopX-hero.getImageView().getX()-30,false);
             TranslateTransition translate=p.first();
-             heroTransition=p.second();
+            heroTransition=p.second();
             Rectangle leg1=hero.getLeg1();
             Rectangle leg2=hero.getLeg2();
             translate.setOnFinished(event -> {
                 // Stop the RotateTransition when translation is finished
-
                 heroTransition.stop();
+                hero.setHeroInMotion(false);
                 RotateTransition r=new RotateTransition(Duration.seconds(0.0001), leg1);
                 r.setToAngle(0);
 //            r.setAutoReverse(true); // Rotate back and forth
@@ -708,7 +738,7 @@ public class GameSceneController implements MousePress {
             System.out.println("nahi chalega");
             Pair<TranslateTransition,ParallelTransition>p=hero.move(stick.stickLength,true);
             TranslateTransition translate=p.first();
-             heroTransition=p.second();
+            heroTransition=p.second();
             Rectangle leg1=hero.getLeg1();
             Rectangle leg2=hero.getLeg2();
             translate.setOnFinished(event -> {
@@ -726,7 +756,7 @@ public class GameSceneController implements MousePress {
 //            r.setCycleCount(Timeline.INDEFINITE);
                 r.play();
                 r.setOnFinished(event1->{
-
+                    hero.playDeathSound();
                     deathTransition.play();
                 });
             });
@@ -740,16 +770,45 @@ public class GameSceneController implements MousePress {
 
     }
     public void handleMousePress(MouseEvent event) {
+        if (gamePaused) {
+            return;
+        }
+
+        System.out.println("[Event] : Mouse Pressed");
+        if (event.getX() <= 35 && event.getY() <= 35) {
+            System.out.println("Pause Button Pressed");
+            gamePaused = true;
+            pausegame();
+            return;
+        }
+
+        if (gameJustResumed) {
+            System.out.println("Game just resumed going from true to false");
+            gameJustResumed = false;
+            return;
+        }
+
         if (heroReachedPillar) {
             return;
         }
 
-        mousePressed += 1;
+
 //        System.out.println("Mouse pressed val is " + mousePressed);
 //        System.out.println("Mouse Pressed at X: " + event.getX() + ", Y: " + event.getY());
+//
+//        if (event.getX() <= 35 && event.getY() <= 35) {
+//            System.out.println("Pause Button Pressed");
+//            return;
+//        }
+
+        mousePressed += 1;
+
+
         if (mousePressed == 1) {
             stick.setVisible(true);
-            stickSound.toggleMusic();
+            if (!stickSound.isPlaying()) {
+                stickSound.playMusic();
+            }
             increaseTimeline.play();
         } else if (mousePressed > 1){
             System.out.println("rotatiin called");
