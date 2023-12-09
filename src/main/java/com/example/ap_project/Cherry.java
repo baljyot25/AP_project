@@ -10,7 +10,7 @@ public class Cherry implements Collidable {
     private static int cherries = 0;//will never be reset to zero
     private final Image image;
     private final ImageView imageView;
-    private final int cherriesToRevive = 1;
+    private final int cherriesToRevive = 5;
     private boolean claimed;
 
     public Cherry() {

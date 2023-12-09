@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
+//  Flyweight Design Pattern Used
 public class Sound {
     private static final Map<String, Sound> instances = new HashMap<String, Sound>();
     private final Media media;

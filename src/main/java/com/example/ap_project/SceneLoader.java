@@ -24,6 +24,7 @@ public class SceneLoader {
         return s;
     }
 
+    // Singleton & Factory Design Pattern Used
     public void loadscene(Pane pane, String s, Stage stage) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(s));
