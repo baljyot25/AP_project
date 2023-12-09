@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class GameSceneController implements MousePress {
 
     @FXML
     private Label score_label;
-
+    private Sound stickSound, cherrySound, bgMusic, dropSound;
     private Score score;
     private Cherry cherry;
     private Stick stick;
@@ -52,10 +53,19 @@ public class GameSceneController implements MousePress {
     private Hero hero;
 
     private ArrayList<Pillar> pillars=new ArrayList<>();
-
-    public static void setPrevpillar(int prevpillar) {
-        GameSceneController.prevpillar = prevpillar;
+    public void initializeSounds() {
+        bgMusic = new Sound("bgMusic.mp3");
+        cherrySound = new Sound("cherrySound.mp3", 1);
+        stickSound = new Sound("increaseStick.mp3");
+        dropSound = new Sound("perfectDrop.mp3", 1);
     }
+
+
+    public static void setPrevpillar ( int prevpillar)
+    {GameSceneController.prevpillar = prevpillar;
+        }
+
+
 
     public static int getPrevpillar() {
         return prevpillar;
@@ -65,6 +75,11 @@ public class GameSceneController implements MousePress {
     private class Stick extends PositionDimension implements Collidable
     {
         Line rod;
+
+        public Line getRod() {
+            return rod;
+        }
+
         private double stickLength = 0.0;
         public Stick(double curStickX,double curStickY)
         {
@@ -104,6 +119,7 @@ public class GameSceneController implements MousePress {
         }
         public void stickFall()
         {
+            stickSound.toggleMusic();
             Rotate rotation = new Rotate();
             rotation.pivotXProperty().bind(rod.startXProperty());
             rotation.pivotYProperty().bind(rod.startYProperty());
@@ -123,12 +139,20 @@ public class GameSceneController implements MousePress {
     {
         //316 max reached
         Random r=new Random();
-        Pillar p=pillars.get(r.nextInt(pillars.size()));
+        int ra=r.nextInt(pillars.size());
+        Pillar p=pillars.get(ra);
+//        pillars.remove(ra);
+
+
+//        p.rectangle=new Rectangle();
         return p;
 
     }
     Rectangle r1;
     Rectangle r2;
+    Pillar pillar1;
+    Pillar pillar2;
+
 
     AnimationTimer collisionTimer = new AnimationTimer() {
         @Override
@@ -137,15 +161,34 @@ public class GameSceneController implements MousePress {
         }
     };
 
-    public void checkCollision() {
-        if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent())) {
-            System.out.println("Collision Detected!");
-        }
+    public void handleCherryCollision() {
+        cherry.onCollision();
+        cherrySound.playMusic();
+        System.out.println("Score is : " + score);
+//        score.increment_current_score();
+       //   to update cherry score
+        System.out.println("Score is : " + score);
     }
+    public void checkCollision() {
+        if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()) && !cherry.isClaimed()) {
+            System.out.println("Collision Detected!");
+            System.out.println("bound intersection val is " + hero.group.getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent()));
+            System.out.println("cherry claimed val is " + cherry.isClaimed());
+            handleCherryCollision();
+            System.out.println("cherry claimed val is " + cherry.isClaimed());
+    }
+}
 
+
+
+    int secondpos;
+    double secwidth;
+    double firstwidth;
     @FXML
     private void initialize() {
-
+        this.initializeSounds();
+        bgMusic.playMusic();
+        score_label.setText(String.valueOf(Score.getCurrent_score()));
 
 
         //every pillar has a default cordinates at the bottom of the screen , whcih will be changes in future
@@ -160,12 +203,18 @@ public class GameSceneController implements MousePress {
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
         Pair<TranslateTransition, Group> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
+        pillar1=pillars.get(0);
+        firstwidth=pillarpair.second().getWidth();
+//        pillars.remove(0);
 
-        Pillar p2=this.AddRandomPillar();
-        while(p2==pillars.get(0))
-        {
-            p2=this.AddRandomPillar();
-        }
+        Pillar p2=AddRandomPillar();
+//        while(p2==pillars.get(0))
+//        {
+//            p2=this.AddRandomPillar();
+//        }
+//        pillar2=p2;
+//        pillars.add(new Pillar(pillar1.height,pillar1.width,Color.BLACK,SCREENWIDTH,484));
+
 
 //        System.out.println(pane.snapSizeX());
         Random r=new Random();
@@ -173,7 +222,10 @@ public class GameSceneController implements MousePress {
         int max=SCREENWIDTH-(int)p2.width();
         System.out.println(p2);
         System.out.println(r.nextInt((max - min) ) + min);
-        Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(p2.getXcordinate(),r.nextInt((max - min) ) + min);
+        secondpos=r.nextInt((max - min) ) + min;
+
+        Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(314,secondpos);
+        secwidth=pillarpair2.second().getWidth();
 //        Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(p2.getXcordinate(),314-p2.width());
 
 
@@ -196,6 +248,7 @@ public class GameSceneController implements MousePress {
         curStickX = pillarpair.second().getWidth();
         curStickY = SCREENHEIGHT - pillarpair.second().getHeight();
         stick=new Stick(curStickX,curStickY);
+//        sticks.add(stick);
 //        System.out.println(pillarpair.second().getX());
 
         //adding timelines
@@ -245,7 +298,84 @@ public class GameSceneController implements MousePress {
         }
 
     }
+    private ArrayList<Stick> sticks=new ArrayList<>();
+
+    private void pillarTransition()
+    {
+        System.out.println("pillar transition");
+        System.out.println(pillar1);
+        System.out.println(r1);
+        pane.getChildren().remove(r1);
+        TranslateTransition transition = new TranslateTransition(Duration.millis(600), r2);
+        System.out.println(r2.getX());
+        System.out.println(r2.getLayoutX());
+        System.out.println(r2.localToScreen(0, 0).getX());
+        System.out.println(secondpos);
+        transition.setByX(-secondpos);
+        firstwidth=r2.getWidth();
+
+        Group group=hero.getGroup();
+        TranslateTransition imageTransition = new TranslateTransition(Duration.seconds(0.6 ), group);
+//        imageTransition.setFromX(secondpos);
+//        imageTransition.setToX(0);
+        imageTransition.setByX(-secondpos);
+//        Pair<TranslateTransition,Rectangle> pillarpair=pillar2.Transition((int)r2.getX(),0);
+//        pillarpair.first().play();
+        Line rod=stick.getRod();
+        TranslateTransition rodtransition=new TranslateTransition(Duration.seconds(0.6 ), rod);
+        rodtransition.setByX(-secondpos);
+        System.out.println(pillars);
+        System.out.println(pillar2);
+        Pillar p2=AddRandomPillar();
+//        Pillar p2=pillars.get(0);
+        secwidth=r2.getWidth();
+        System.out.println(p2);
+
+//        System.out.println(p2);
+        if(p2==pillar1)
+        {
+            System.out.println("sdmfsd");
+        }
+        Random r=new Random();
+        int min= (int) r2.getWidth() + 5;
+        int max=SCREENWIDTH-(int)p2.width();
+        System.out.println("max"+max+"min"+min);
+        secondpos=r.nextInt((max - min) ) + min;
+        System.out.println(p2.getXcordinate());
+        Pair<TranslateTransition,Rectangle> pillarpair2=p2.Transition(314,secondpos);
+        System.out.println(pillarpair2.second());
+//        secwidth=pillarpair2.second().getWidth();
+
+        pane.getChildren().add(pillarpair2.second());
+
+        transition.play();
+        imageTransition.play();
+        rodtransition.play();
+        pillarpair2.first().play();
+        Score.setCurrent_score(Score.getCurrent_score()+1);
+        score_label.setText(String.valueOf(Score.getCurrent_score()));
+        r1=r2;
+        pillar1=pillar2;
+        pillar2=p2;
+        r2=pillarpair2.second();
+        mousePressed=0;
+        curStickX = r1.getWidth();
+        curStickY = SCREENHEIGHT - r1.getHeight();
+        sticks.add(stick);
+        System.out.println(sticks);
+        if (sticks.size()>=2)
+        {
+
+            sticks.get(sticks.size()-2).setVisible(false);
+        }
+
+//        stick.setVisible(false);
+        stick=new Stick(curStickX,curStickY);
+//        sticks.add(stick);
+    }
+
     private void makeHeroMove() {
+        dropSound.playMusic();
         collisionTimer.start();
         double rec1X= r1.localToScreen(0, 0).getX();
         double rec1Y = r1.localToScreen(0, 0).getY();
@@ -253,6 +383,7 @@ public class GameSceneController implements MousePress {
         double rec2Y = r2.localToScreen(0, 0).getY();
         double rec1width=r1.getWidth();
         double rec2width=r2.getWidth();
+        double rightTopX = r2.getBoundsInParent().getMaxX();
 
         System.out.println(r1.getWidth());
         System.out.println("Rectangle position on screen: X=" + rec1X + ", Y=" + rec1Y);
@@ -263,11 +394,25 @@ public class GameSceneController implements MousePress {
         System.out.println("Rectangle position on screen: X=" + (rec2X+r2.getWidth()) + ", Y=" + rec2Y);
         System.out.println(stick.stickLength);
         TranslateTransition deathTransition=hero.onDeath();
+        deathTransition.setOnFinished(Event->
+        {
+            SceneLoader s=SceneLoader.getInstance();
+            s.loadscene(pane,"game_end_scene.fxml", (Stage) r1.getScene().getWindow());
+        });
 
         if (rec1X+rec1width+stick.stickLength+1.9>=rec2X  && rec1X+rec1width+stick.stickLength+1.9<=rec2X+rec2width)
         {
+
+
+
+
+            System.out.println("Second pas"+secondpos);
+            System.out.println("r2 pos"+r2.getLayoutX());
+            System.out.println("r2 pos"+(r2.localToScreen(0,0).getX()-r1.localToScreen(0,0).getX()));
             System.out.println("chalega");
-            Pair<TranslateTransition,ParallelTransition>p=hero.move(rec2X+rec2width-(rec1X+rec1width)-14);
+
+
+            Pair<TranslateTransition,ParallelTransition>p=hero.move(rightTopX-hero.getImageView().getX()-30,false);
             TranslateTransition translate=p.first();
             ParallelTransition parallelTransition=p.second();
             Rectangle leg1=hero.getLeg1();
@@ -286,13 +431,17 @@ public class GameSceneController implements MousePress {
 //            r.setAutoReverse(true); // Rotate back and forth
 //            r.setCycleCount(Timeline.INDEFINITE);
                 r.play();
+                r.setOnFinished(event1->
+                {
+                    pillarTransition();
+                });
             });
             parallelTransition.play();
 
         }
         else {
             System.out.println("nahi chalega");
-            Pair<TranslateTransition,ParallelTransition>p=hero.move(stick.stickLength);
+            Pair<TranslateTransition,ParallelTransition>p=hero.move(stick.stickLength,true);
             TranslateTransition translate=p.first();
             ParallelTransition parallelTransition=p.second();
             Rectangle leg1=hero.getLeg1();
@@ -358,6 +507,7 @@ public class GameSceneController implements MousePress {
 //        System.out.println("Mouse Pressed at X: " + event.getX() + ", Y: " + event.getY());
         if (mousePressed == 1) {
             stick.setVisible(true);
+            stickSound.toggleMusic();
             increaseTimeline.play();
         } else if (mousePressed > 1){
 

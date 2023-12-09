@@ -25,7 +25,7 @@ public class SceneLoader {
     }
     private SceneLoader(){}
 
-    public void loadscene(Pane pane, String s, MouseEvent event)
+    public void loadscene(Pane pane, String s,Stage stage)
     {
         try
         {
@@ -39,7 +39,7 @@ public class SceneLoader {
             Scene scene = new Scene(root,314, 665);
 
             // Get the current stage (window)
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
 
             TranslateTransition transition = new TranslateTransition(Duration.seconds(0.4), pane);
             transition.setToX(-stage.getWidth());

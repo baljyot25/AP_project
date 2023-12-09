@@ -36,7 +36,8 @@ public class GameStartController {
     @FXML
     private void handleButtonClick(MouseEvent event){
         SceneLoader s=SceneLoader.getInstance();
-        s.loadscene(rootPane,"game_scene.fxml",event);
+
+        s.loadscene(rootPane,"game_scene.fxml", (Stage) ((Node) event.getSource()).getScene().getWindow());
 
 
     }

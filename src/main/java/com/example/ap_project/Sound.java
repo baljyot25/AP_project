@@ -10,10 +10,16 @@ public class Sound {
     private Media media;
     private MediaPlayer mediaPlayer;
 
-    public Sound() {
-        this.media = new Media(Objects.requireNonNull(getClass().getResource("music.mp3")).toString());
+    public Sound(String soundName) {
+        this.media = new Media(Objects.requireNonNull(getClass().getResource("audio/" + soundName)).toString());
         this.mediaPlayer = new MediaPlayer(media);
         this.mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+    }
+
+    public Sound(String soundName, int cycleCount) {
+        this.media = new Media(Objects.requireNonNull(getClass().getResource("audio/" + soundName)).toString());
+        this.mediaPlayer = new MediaPlayer(media);
+        this.mediaPlayer.setCycleCount(cycleCount);
     }
 
     public void toggleMusic() {
@@ -24,7 +30,11 @@ public class Sound {
         }
     }
 
+    public void playMusic() {
+        mediaPlayer.play();
+    }
+
     public void stop() {
         mediaPlayer.stop();
-    }
+}
 }
