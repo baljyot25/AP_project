@@ -3,11 +3,14 @@ package com.example.ap_project;
 import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -23,6 +26,7 @@ public class GameSceneController implements MousePress {
 
     @FXML
     private Pane pane;
+    private MediaPlayer mediaPlayer;
     private Map<String,Sound> sounds;
 
     @FXML
@@ -126,8 +130,23 @@ public class GameSceneController implements MousePress {
     Rectangle r1;
     Rectangle r2;
 
+    AnimationTimer collisionTimer = new AnimationTimer() {
+        @Override
+        public void handle(long l) {
+            checkCollision();
+        }
+    };
+
+    public void checkCollision() {
+        if (hero.getGroup().getBoundsInParent().intersects(cherry.getImageView().getBoundsInParent())) {
+            System.out.println("Collision Detected!");
+        }
+    }
+
     @FXML
     private void initialize() {
+
+
 
         //every pillar has a default cordinates at the bottom of the screen , whcih will be changes in future
 
@@ -137,6 +156,7 @@ public class GameSceneController implements MousePress {
         pillars.add(new Pillar(184,70,Color.BLACK,SCREENWIDTH,484));
         System.out.println(pillars);
         hero=new Hero();
+        cherry = new Cherry();
 
         Pair<TranslateTransition,Rectangle> pillarpair=pillars.get(0).Transition(pillars.get(0).getXcordinate(),0);
         Pair<TranslateTransition, Group> heropair=hero.returnTransition(pillars.get(0).getXcordinate(),pillarpair.second());
@@ -161,6 +181,10 @@ public class GameSceneController implements MousePress {
         pane.getChildren().add(pillarpair2.second());
         pane.getChildren().add(heropair.second());
 
+        pane.getChildren().add(cherry.getImageView());
+        cherry.getImageView().setX(150);
+        cherry.getImageView().setY(450);
+
         pane.getChildren().add(pillarpair.second());
 
         heropair.first().play();
@@ -182,8 +206,28 @@ public class GameSceneController implements MousePress {
         pane.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleMouseReleased);
         pane.addEventFilter(MouseEvent.MOUSE_CLICKED,this :: handleMouseClick);
 
+
+
+
+
     }
 
+    private void toggleMusic() {
+        // Check if the music is currently playing
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            // Pause the music if it's playing
+            mediaPlayer.pause();
+        } else {
+            // Resume the music if it's paused
+            mediaPlayer.play();
+        }
+    }
+
+    //    @Override
+    public void stop() {
+        // Release resources when the application is closed
+        mediaPlayer.stop();
+    }
 
 
     private void handleMouseClick(MouseEvent event)  {
@@ -202,6 +246,7 @@ public class GameSceneController implements MousePress {
 
     }
     private void makeHeroMove() {
+        collisionTimer.start();
         double rec1X= r1.localToScreen(0, 0).getX();
         double rec1Y = r1.localToScreen(0, 0).getY();
         double rec2X = r2.localToScreen(0, 0).getX();
@@ -330,9 +375,6 @@ public class GameSceneController implements MousePress {
         }
 
     }
-        
-
-    }
 
 
-
+}
