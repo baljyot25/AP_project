@@ -21,7 +21,7 @@ public class App extends Application{
         new Thread(() -> {
             System.out.println("Thread created!\n");
             bgMusic = Sound.getInstance("bgMusic.mp3");
-            bgMusic.playMusic();
+//            bgMusic.playMusic();
         }).start();
 
 

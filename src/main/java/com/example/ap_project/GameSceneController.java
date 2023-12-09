@@ -312,7 +312,7 @@ public class GameSceneController implements MousePress {
             handleObstacleCollision();
             System.out.println("obstacle claimed val is " + obstacle.didCrash());
         }
-        if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent()) && !collidedWithPillar) {
+        if (hero.getGroup().getBoundsInParent().intersects(r2.getBoundsInParent()) && !collidedWithPillar && heroInverted) {
             collidedWithPillar = true;
             heroTransition.stop();
             System.out.println("Pillar Collision Detected!");

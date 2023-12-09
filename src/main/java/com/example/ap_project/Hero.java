@@ -129,7 +129,7 @@ public class Hero extends PositionDimension implements Collidable , MousePress {
 
 
         //setting the duration for the Translate transition
-        translate.setDuration(Duration.millis(distanceToMove*10));
+        translate.setDuration(Duration.millis(distanceToMove*40));
 
         //setting cycle count for the Translate transition
         translate.setCycleCount(1);
